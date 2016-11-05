@@ -1,8 +1,7 @@
-import { Model } from 'chaos-orm';
-import Gallery from './gallery';
+var Model = require('chaos-orm').Model;
+var Gallery = require('./gallery');
 
 class GalleryDetail extends Model {
-
   static _define(schema) {
     schema.column('id', { type: 'serial' });
     schema.column('description', { type: 'string' });
@@ -14,4 +13,4 @@ class GalleryDetail extends Model {
 
 GalleryDetail.register();
 
-export default GalleryDetail;
+module.exports = GalleryDetail;

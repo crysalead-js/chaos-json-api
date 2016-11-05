@@ -1,8 +1,7 @@
 Promise = require('bluebird');
 
-import 'babel-polyfill';
-import { Model } from 'chaos-orm';
-import { Schema } from 'chaos-database';
+var Model = require('chaos-orm').Model;
+var Schema = require('chaos-database').Schema;
 
 Model.definition(Schema);
 

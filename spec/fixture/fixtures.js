@@ -1,7 +1,8 @@
-import co from 'co';
-import { extend, merge } from 'extend-merge';
-import { Model } from 'chaos-orm';
-import { Schema } from '../../src';
+var co = require('co');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var Model = require('chaos-orm').Model;
+var Schema = require('../../src/schema');
 
 class Fixtures {
   /**
@@ -171,4 +172,4 @@ Fixtures._classes = {
   model: Model
 }
 
-export default Fixtures;
+module.exports = Fixtures;

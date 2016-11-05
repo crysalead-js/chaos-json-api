@@ -1,8 +1,15 @@
-import co from 'co';
-import { extend, merge } from 'extend-merge';
-import { Schema as BaseSchema, Collection, Relationship, BelongsTo, HasOne, HasMany, HasManyThrough } from 'chaos-orm';
-import Query from './query';
-import Payload from './payload';
+var co = require('co');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var BaseSchema = require('chaos-orm').Schema;
+var Collection = require('chaos-orm').Collection;
+var Relationship = require('chaos-orm').Relationship;
+var BelongsTo = require('chaos-orm').BelongsTo;
+var HasOne = require('chaos-orm').HasOne;
+var HasMany = require('chaos-orm').HasMany;
+var HasManyThrough = require('chaos-orm').HasManyThrough;
+var Query = require('./query');
+var Payload = require('./payload');
 
 function arrayDiff(a, b) {
   var len = a.length;
@@ -183,4 +190,4 @@ Schema._classes = {
   query: Query
 };
 
-export default Schema;
+module.exports = Schema;

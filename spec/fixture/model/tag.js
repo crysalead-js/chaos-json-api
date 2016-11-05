@@ -1,11 +1,9 @@
-import { Model } from 'chaos-orm';
-import Image from './image';
-import ImageTag from './image-tag';
+var Model = require('chaos-orm').Model;
+var Image = require('./image');
+var ImageTag = require('./image-tag');
 
-class Tag extends Model
-{
-  static _define(schema)
-  {
+class Tag extends Model {
+  static _define(schema) {
     schema.column('id', { type: 'serial' });
     schema.column('name', { type: 'string', length: 50 });
 
@@ -16,4 +14,5 @@ class Tag extends Model
 
 Tag.register();
 
-export default Tag;
+module.exports = Tag;
+

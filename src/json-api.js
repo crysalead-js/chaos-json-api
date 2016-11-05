@@ -1,9 +1,10 @@
-import co from 'co';
-import { extend, merge } from 'extend-merge';
-import { Source } from 'chaos-orm';
-import dateformat from 'date-format';
-import trim from 'trim-character';
-import Schema from './schema';
+var co = require('co');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var Source = require('chaos-orm').Source;
+var dateformat = require('date-format');
+var trim = require('trim-character');
+var Schema = require('./schema');
 
 function queryStringify(obj, prefix) {
   var str = [];
@@ -285,4 +286,4 @@ JsonApi._classes = {
   schema: Schema
 };
 
-export default JsonApi;
+module.exports = JsonApi;

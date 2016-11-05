@@ -1,7 +1,13 @@
-import Schema from './schema';
-import Query from './query';
-import JsonApi from './json-api';
-import Payload from './payload';
-import Paging from './paging';
+var Schema = require('./schema');
+var Query = require('./query');
+var JsonApi = require('./json-api');
+var Payload = require('./payload');
+var Paging = require('./paging');
 
-export { Schema, Query, JsonApi, Payload, Paging };
+module.exports = {
+  Schema: Schema,
+  Query: Query,
+  JsonApi: JsonApi,
+  Payload: Payload,
+  Paging: Paging
+};

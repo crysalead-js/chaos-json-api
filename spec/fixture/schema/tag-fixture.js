@@ -1,6 +1,6 @@
-import co from 'co';
-import Fixture from '../fixture';
-import Tag from '../model/tag';
+var co = require('co');
+var Fixture = require('../fixture');
+var Tag = require('../model/tag');
 
 class TagFixture extends Fixture {
 
@@ -28,4 +28,4 @@ class TagFixture extends Fixture {
   }
 }
 
-export default TagFixture;
+module.exports = TagFixture;

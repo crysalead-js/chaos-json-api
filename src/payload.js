@@ -1,6 +1,10 @@
-import camelize from 'camel-case';
-import { extend, merge } from "extend-merge";
-import { Model, Collection, Through, Source } from 'chaos-orm';
+var camelize = require('camel-case');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var Model = require('chaos-orm').Model;
+var Collection = require('chaos-orm').Collection;
+var Through = require('chaos-orm').Through;
+var Source = require('chaos-orm').Source;
 
 /**
  * JSON-API payload.
@@ -720,4 +724,4 @@ class Payload {
   }
 }
 
-export default Payload;
+module.exports = Payload;

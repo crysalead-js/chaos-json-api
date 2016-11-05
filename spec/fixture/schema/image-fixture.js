@@ -1,6 +1,6 @@
-import co from 'co';
-import Fixture from '../fixture';
-import Image from '../model/image';
+var co = require('co');
+var Fixture = require('../fixture');
+var Image = require('../model/image');
 
 class ImageFixture extends Fixture {
 
@@ -27,4 +27,4 @@ class ImageFixture extends Fixture {
   }
 }
 
-export default ImageFixture;
+module.exports = ImageFixture;

@@ -1,8 +1,10 @@
-import co from 'co';
-import sqlite3 from 'sqlite3';
-import { extend, merge } from 'extend-merge';
-import { Database } from 'chaos-database';
-import { Sqlite as SqliteDialect } from 'sql-dialect';
+var co = require('co');
+var sqlite3 = require('sqlite3');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+
+var Database = require('chaos-database').Database;
+var SqliteDialect = require('sql-dialect').Sqlite;
 
 /**
  * SQLite adapter
@@ -285,4 +287,4 @@ class Sqlite extends Database {
   }
 }
 
-export default Sqlite;
+module.exports = Sqlite;

@@ -1,7 +1,8 @@
-import co from 'co';
-import { extend, merge } from 'extend-merge';
-import { Collector } from 'chaos-orm';
-import Payload from './payload';
+var co = require('co');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var Collector = require('chaos-orm').Collector;
+var Payload = require('./payload');
 
 /**
  * The Query wrapper.
@@ -424,4 +425,4 @@ Query._classes = {
   collector: Collector
 };
 
-export default Query;
+module.exports = Query;

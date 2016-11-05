@@ -1,6 +1,6 @@
-import co from 'co';
-import Fixture from '../fixture';
-import Gallery from '../model/gallery';
+var co = require('co');
+var Fixture = require('../fixture');
+var Gallery = require('../model/gallery');
 
 class GalleryFixture extends Fixture {
 
@@ -24,4 +24,4 @@ class GalleryFixture extends Fixture {
   }
 }
 
-export default GalleryFixture;
+module.exports = GalleryFixture;

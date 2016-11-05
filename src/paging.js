@@ -1,6 +1,8 @@
-import co from 'co';
-import { extend, merge } from "extend-merge";
-import { Schema, Document } from 'chaos-orm';
+var co = require('co');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
+var Schema = require('chaos-orm').Schema;
+var Document = require('chaos-orm').Document;
 
 /**
  * Paging.
@@ -129,4 +131,4 @@ class Paging extends Document {
 
 Paging.limit = 10;
 
-export default Paging;
+module.exports = Paging;

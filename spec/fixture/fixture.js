@@ -1,5 +1,6 @@
-import co from 'co';
-import { extend, merge } from 'extend-merge';
+var co = require('co');
+var extend = require('extend-merge').extend;
+var merge = require('extend-merge').merge;
 
 class Fixture {
   /**
@@ -201,4 +202,4 @@ class Fixture {
   }
 }
 
-export default Fixture;
+module.exports = Fixture;
