@@ -138,7 +138,26 @@ class Query {
   }
 
   queryString() {
-    var data = {};
+    var data = {filter: {}};
+
+    var key = this.schema().key();
+
+    for(var conditions of this._conditions) {
+      for(var field in conditions) {
+        if (field === key) {
+          continue;
+        }
+        data.filter[field] = conditions[field];
+        if (Array.isArray(data.filter[field])) {
+          data.filter[field] = data.filter[field].join(',');
+        }
+      }
+    }
+
+    if (Object.keys(data.filter).length === 0) {
+      delete data.filter;
+    }
+
     if (this._page.limit) {
       if (this._page.page) {
         data.page = {
@@ -151,6 +170,7 @@ class Query {
       }
       data.page.limit = this._page.limit;
     }
+
     return data;
   }
 

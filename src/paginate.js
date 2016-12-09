@@ -5,9 +5,9 @@ var Schema = require('chaos-orm').Schema;
 var Document = require('chaos-orm').Document;
 
 /**
- * Paging.
+ * Paginate.
  */
-class Paging extends Document {
+class Paginate extends Document {
 
   /**
    * Constructor.
@@ -30,10 +30,10 @@ class Paging extends Document {
     this._resource = resource;
 
     if (!this._resource) {
-      throw new Error('Paging requires a valid resource as first constructor parameter.')
+      throw new Error('Paginate requires a valid resource as first constructor parameter.')
     }
 
-    config.query.limit = config.query.limit || Paging.limit;
+    config.query.limit = config.query.limit || Paginate.limit;
     config.query.page = Number.parseInt(config.query.page) || 1;
 
     this.set({
@@ -58,7 +58,7 @@ class Paging extends Document {
   }
 
   /**
-   * Returns the paging resource.
+   * Returns the paginated resource.
    *
    * @return Function
    */
@@ -129,6 +129,6 @@ class Paging extends Document {
   }
 }
 
-Paging.limit = 10;
+Paginate.limit = 10;
 
-module.exports = Paging;
+module.exports = Paginate;

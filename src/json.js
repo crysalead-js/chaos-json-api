@@ -79,6 +79,20 @@ class JsonApi extends Source {
     this._lastInsert = undefined;
 
     /**
+     * The last request.
+     *
+     * @var Object
+     */
+    this._lastRequest = undefined;
+
+    /**
+     * The last response.
+     *
+     * @var Object
+     */
+    this._lastResponse = undefined;
+
+    /**
      * Stores configuration information for object instances at time of construction.
      *
      * @var Object
@@ -179,10 +193,7 @@ class JsonApi extends Source {
    */
   send(method, path, data) {
     return new Promise(function(resolve, reject) {
-      var headers = extend({}, this._config.headers, {
-        'Accept': 'application/vnd.api+json',
-        'Content-Type': 'application/vnd.api+json'
-      });
+      var headers = extend({}, this._config.headers);
 
       var body = null;
 
@@ -193,23 +204,30 @@ class JsonApi extends Source {
         body = JSON.stringify(data);
       }
 
+      var url =trim.right(this._config.basePath, '/') + '/' + trim.left(path, '/');
+
+      this._lastRequest = { url: url, headers: headers, data: data, body: body };
+
       var xhr = new XMLHttpRequest();
-      xhr.open(method, trim.right(this._config.basePath, '/') + '/' + trim.left(path, '/'), true);
+      xhr.open(method, url, true);
       for (var name in headers) {
         xhr.setRequestHeader(name, headers[name]);
       }
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
+
+          var data = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+          this._lastResponse = { status: xhr.status, statusText: xhr.statusText, data: data, body: xhr.responseText };
+
           if (xhr.status >= 200 && xhr.status < 300) {
-            var response = xhr.responseText ? JSON.parse(xhr.responseText) : '';
             if (/POST/i.test(method)) {
-              if (response && response.data && !Array.isArray(response.data)) {
-                this._lastInsert = response.data;
+              if (data.data && !Array.isArray(data.data)) {
+                this._lastInsert = data.data;
               }
             }
-            resolve(response);
+            resolve(data);
           } else {
-            reject({ status: xhr.status, statusText: xhr.statusText, body: xhr.responseText });
+            reject(this._lastResponse);
           }
         }
       };
@@ -268,12 +286,30 @@ class JsonApi extends Source {
   }
 
   /**
-   * Returns the last inserted record from the database.
+   * Return the last inserted record from the database.
    *
    * @return mixed The last inserted record.
    */
   lastInsert() {
     return this._lastInsert;
+  }
+
+  /**
+   * Return the last request.
+   *
+   * @return Object The last request.
+   */
+  lastRequest() {
+    return this._lastRequest;
+  }
+
+  /**
+   * Return the last response.
+   *
+   * @return Object The last response.
+   */
+  lastResponse() {
+    return this._lastResponse;
   }
 }
 

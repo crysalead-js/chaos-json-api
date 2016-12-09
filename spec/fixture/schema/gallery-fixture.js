@@ -5,7 +5,7 @@ var Gallery = require('../model/gallery');
 class GalleryFixture extends Fixture {
 
   constructor(config) {
-    config.model = Gallery;
+    config.reference = Gallery;
     super(config);
   }
 

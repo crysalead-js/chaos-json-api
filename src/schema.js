@@ -36,7 +36,7 @@ function path() {
 
 class Schema extends BaseSchema {
   /**
-   * Returns a query to retrieve data from the connected data source.
+   * Return a query to retrieve data from the connected data source.
    *
    * @param  Object options Query options.
    * @return Object         An instance of `Query`.
@@ -58,7 +58,7 @@ class Schema extends BaseSchema {
   }
 
   /**
-   * Creates the schema.
+   * Create the schema.
    *
    * @param  Object  options An object of options.
    * @return Boolean
@@ -68,7 +68,7 @@ class Schema extends BaseSchema {
   }
 
   /**
-   * Drops the schema
+   * Drop the schema
    *
    * @param  array   options An array of options.
    * @return boolean
@@ -107,17 +107,9 @@ class Schema extends BaseSchema {
       var payload = new Payload();
       payload.set(new Collection({data: inserts}));
       try {
-        yield this.connection().post('/' + this.source(), payload.serialize());
+        this._sync(inserts, yield this.connection().post('/' + this.source(), payload.serialize()), {exists: true});
       } catch (response) {
-        var body = JSON.parse(response.body || null);
-        var errors = body.errors || [];
-        for (var index in errors) {
-          if (errors.hasOwnProperty(index)) {
-            console.log(inserts[index]);
-            console.log(errors[index]);
-          }
-        }
-        throw response;
+        this._manageErrors(inserts, response);
       }
     }.bind(this));
   }
@@ -137,15 +129,58 @@ class Schema extends BaseSchema {
       var payload = new Payload();
       payload.set(new Collection({data: updates}));
       try {
-        yield this.connection().patch('/' + this.source(), payload.serialize());
+        this._sync(updates, yield this.connection().patch('/' + this.source(), payload.serialize()));
       } catch (response) {
-        throw response;
+        this._manageErrors(updates, response);
       }
     }.bind(this));
   }
 
   /**
-   * Deletes a record or document.
+   * Sync data from the response payload.
+   *
+   * @param Array  collection The sent collection
+   * @param Object response   The JSON-API response payload
+   * @param Object options    Some additionnal sync options
+   */
+  _sync(collection, response, options) {
+    options = options || {};
+    var result = Payload.parse(extend({data:[]}, response)).export();
+    if (collection.length !== result.length) {
+      throw new Error('Error, received data must have the same length as sent data.');
+    }
+    for (var i = 0, len = result.length; i < len; i++) {
+      collection[i].sync(null, result[i], options);
+    }
+  }
+
+  /**
+   * Manage errors as well as validation errors.
+   *
+   * @param Array  collection The sent collection
+   * @param Object response   The JSON-API error response payload
+   */
+  _manageErrors(collection, response) {
+    if (!response || !response.data || !response.data.errors) {
+      return;
+    }
+    var errors = response.data.errors;
+    for (var error of errors) {
+      if (error.code !== 0) {
+        throw new Error(error.title);
+      }
+      var meta = error.meta;
+      if (collection.length !== meta.length) {
+        throw new Error('Error, received errors must have the same length as sent data.');
+      }
+      for (var i = 0, len = meta.length; i < len; i++) {
+        collection[i].invalidate(meta[i]);
+      }
+    }
+  }
+
+  /**
+   * Delete a record or document.
    *
    * @param  mixed    conditions The conditions with key/value pairs representing the ID of the records or
    *                             documents to be deleted.
@@ -165,7 +200,7 @@ class Schema extends BaseSchema {
   }
 
   /**
-   * Returns the last insert id from the database.
+   * Return the last insert id from the database.
    *
    * @return mixed Returns the last insert id.
    */
@@ -173,6 +208,24 @@ class Schema extends BaseSchema {
     var key = this.key();
     var data = this.connection().lastInsert();
     return data ? data[key] : undefined;
+  }
+
+  /**
+   * Return the last request.
+   *
+   * @return Object Returns the last request.
+   */
+  lastRequest() {
+    return this.connection().lastRequest();
+  }
+
+  /**
+   * Return the last response.
+   *
+   * @return Object Returns the last response.
+   */
+  lastResponse() {
+    return this.connection().lastResponse();
   }
 }
 

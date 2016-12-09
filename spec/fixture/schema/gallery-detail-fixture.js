@@ -5,7 +5,7 @@ var GalleryDetail = require('../model/gallery-detail');
 class GalleryDetailFixture extends Fixture {
 
   constructor(config) {
-    config.model = GalleryDetail;
+    config.reference = GalleryDetail;
     super(config);
   }
 

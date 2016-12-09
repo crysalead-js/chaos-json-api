@@ -1,13 +1,13 @@
 var Schema = require('./schema');
 var Query = require('./query');
-var JsonApi = require('./json-api');
+var Json = require('./json');
 var Payload = require('./payload');
-var Paging = require('./paging');
+var Paginate = require('./paginate');
 
 module.exports = {
   Schema: Schema,
   Query: Query,
-  JsonApi: JsonApi,
+  Json: Json,
   Payload: Payload,
-  Paging: Paging
+  Paginate: Paginate
 };

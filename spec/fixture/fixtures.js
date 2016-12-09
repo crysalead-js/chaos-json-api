@@ -136,8 +136,8 @@ class Fixtures {
     return co(function*() {
       for (var key in this._instances) {
         var instance = this._instances[key];
-        var model = instance.model();
-        yield model.remove();
+        var reference = instance.reference();
+        yield reference.remove();
       }
     }.bind(this));
   }
@@ -160,8 +160,8 @@ class Fixtures {
   reset() {
     for (var key in this._instances) {
       var instance = this._instances[key];
-      var model = instance.model();
-      model.reset();
+      var reference = instance.reference();
+      reference.reset();
     }
     this._instances = {};
   }
@@ -169,7 +169,7 @@ class Fixtures {
 
 Fixtures._classes = {
   schema: Schema,
-  model: Model
+  reference: Model
 }
 
 module.exports = Fixtures;
