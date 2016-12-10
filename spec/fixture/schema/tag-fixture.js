@@ -5,7 +5,7 @@ var Tag = require('../model/tag');
 class TagFixture extends Fixture {
 
   constructor(config) {
-    config.reference = Tag;
+    config.model = Tag;
     super(config);
   }
 

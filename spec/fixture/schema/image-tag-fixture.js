@@ -5,7 +5,7 @@ var ImageTag = require('../model/image-tag');
 class ImageTagFixture extends Fixture {
 
   constructor(config) {
-    config.reference = ImageTag;
+    config.model = ImageTag;
     super(config);
   }
 

@@ -33,11 +33,11 @@ describe("Payload", function() {
       yield this.fixtures.populate('image_tag', ['create']);
       yield this.fixtures.populate('tag', ['create']);
 
-      this.gallery = this.fixtures.get('gallery').reference();
-      this.galleryDetail = this.fixtures.get('gallery_detail').reference();
-      this.image = this.fixtures.get('image').reference();
-      this.image_tag = this.fixtures.get('image_tag').reference();
-      this.tag = this.fixtures.get('tag').reference();
+      this.gallery = this.fixtures.get('gallery').model();
+      this.galleryDetail = this.fixtures.get('gallery_detail').model();
+      this.image = this.fixtures.get('image').model();
+      this.image_tag = this.fixtures.get('image_tag').model();
+      this.tag = this.fixtures.get('tag').model();
 
     }.bind(this)).then(function() {
       done();

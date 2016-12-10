@@ -5,7 +5,7 @@ var Image = require('../model/image');
 class ImageFixture extends Fixture {
 
   constructor(config) {
-    config.reference = Image;
+    config.model = Image;
     super(config);
   }
 
