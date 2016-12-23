@@ -63,7 +63,7 @@ describe("Payload", function() {
       expect(payload.errors()).toEqual([{
         status: 500,
         code: 500,
-        message: "The JSON-API serializer only supports Chaos entities."
+        message: 'The JSON-API serializer only supports Chaos entities.'
       }]);
 
     });
@@ -84,7 +84,7 @@ describe("Payload", function() {
         expect(payload.errors()).toEqual([{
           status: 422,
           code: 0,
-          title: "Validation Error",
+          title: 'Validation Error',
           meta: [
             {
               name: [
@@ -112,11 +112,11 @@ describe("Payload", function() {
         payload.delete(images);
         expect(payload.serialize()).toEqual({
           data: [
-            { type: 'image', id: 1 },
-            { type: 'image', id: 2 },
-            { type: 'image', id: 3 },
-            { type: 'image', id: 4 },
-            { type: 'image', id: 5 }
+            { type: 'Image', id: 1 },
+            { type: 'Image', id: 2 },
+            { type: 'Image', id: 3 },
+            { type: 'Image', id: 4 },
+            { type: 'Image', id: 5 }
           ]
         });
         done();
@@ -196,7 +196,7 @@ describe("Payload", function() {
       var payload = new Payload();
       payload.set(image);
       expect(payload.data()).toEqual({
-        type: 'image',
+        type: 'Image',
         attributes: {
           title: 'Amiga 1200',
           gallery: {
@@ -230,26 +230,26 @@ describe("Payload", function() {
         expect(payload.isCollection()).toBe(false);
 
         expect(payload.data()).toEqual({
-          type: "image",
+          type: 'Image',
           id: 1,
           attributes: {
             gallery_id: 1,
-            name: "amiga_1200.jpg",
-            title: "Amiga 1200"
+            name: 'amiga_1200.jpg',
+            title: 'Amiga 1200'
           },
           relationships: {
             gallery: {
               data: {
-                type: "gallery",
+                type: 'Gallery',
                 id: 1
               }
             },
             tags: {
               data: [{
-                type: "tag",
+                type: 'Tag',
                 id: 1
               }, {
-                type: "tag",
+                type: 'Tag',
                 id: 3
               }]
             }
@@ -258,36 +258,36 @@ describe("Payload", function() {
 
         expect(payload.included()).toEqual([
           {
-            type: "gallery",
+            type: 'Gallery',
             id: 1,
             attributes: {
-              name: "Foo Gallery"
+              name: 'Foo Gallery'
             }
           }, {
-            type: "image_tag",
+            type: 'ImageTag',
             id: 1,
             attributes: {
               image_id: 1,
               tag_id: 1
             }
           }, {
-            type: "image_tag",
+            type: 'ImageTag',
             id: 2,
             attributes: {
               image_id: 1,
               tag_id: 3
             }
           }, {
-            type: "tag",
+            type: 'Tag',
             id: 1,
             attributes: {
-              name: "High Tech"
+              name: 'High Tech'
             }
           }, {
-            type: "tag",
+            type: 'Tag',
             id: 3,
             attributes: {
-              name: "Computer"
+              name: 'Computer'
             }
           }
         ]);
@@ -311,20 +311,20 @@ describe("Payload", function() {
 
         expect(payload.data()).toEqual([
           {
-            type: "image",
+            type: 'Image',
             id: 1,
             attributes: {
               gallery_id: 1,
-              name: "amiga_1200.jpg",
-              title: "Amiga 1200"
+              name: 'amiga_1200.jpg',
+              title: 'Amiga 1200'
             }
           }, {
-            type: "image",
+            type: 'Image',
             id: 2,
             attributes: {
               gallery_id: 1,
-              name: "srinivasa_ramanujan.jpg",
-              title: "Srinivasa Ramanujan"
+              name: 'srinivasa_ramanujan.jpg',
+              title: 'Srinivasa Ramanujan'
             }
           }
         ]);
@@ -376,49 +376,49 @@ describe("Payload", function() {
       });
 
       expect(payload.included()).toEqual([{
-        type: "people",
-        id: "9",
+        type: 'people',
+        id: '9',
         attributes: {
-          firstName: "Dan",
-          lastName: "Gebhardt",
-          twitter: "dgeb"
+          firstName: 'Dan',
+          lastName: 'Gebhardt',
+          twitter: 'dgeb'
         },
         links: {
-          self: "http:\/\/example.com\/people\/9"
+          self: 'http:\/\/example.com\/people\/9'
         }
       }, {
-        type: "comments",
-        id: "5",
+        type: 'comments',
+        id: '5',
         attributes: {
-          body: "First!"
+          body: 'First!'
         },
         relationships: {
           author: {
             data: {
-              type: "people",
-              id: "2"
+              type: 'people',
+              id: '2'
             }
           }
         },
         links: {
-          self: "http:\/\/example.com\/comments\/5"
+          self: 'http:\/\/example.com\/comments\/5'
         }
       }, {
-        type: "comments",
-        id: "12",
+        type: 'comments',
+        id: '12',
         attributes: {
-          body: "I like XML better"
+          body: 'I like XML better'
         },
         relationships: {
           author: {
             data: {
-              type: "people",
-              id: "9"
+              type: 'people',
+              id: '9'
             }
           }
         },
         links: {
-          self: "http:\/\/example.com\/comments\/12"
+          self: 'http:\/\/example.com\/comments\/12'
         }
       }]);
 
@@ -430,12 +430,12 @@ describe("Payload", function() {
       var payload = Payload.parse(json);
 
       expect(payload.errors()).toEqual([{
-        code: "123",
+        code: '123',
         source: {
-          pointer: "\/data\/attributes\/firstName"
+          pointer: '\/data\/attributes\/firstName'
         },
-        title: "Value is too short",
-        detail: "First name must contain at least three characters."
+        title: 'Value is too short',
+        detail: 'First name must contain at least three characters.'
       }]);
 
     });

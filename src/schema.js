@@ -71,7 +71,7 @@ class Schema extends BaseSchema {
   query(options) {
     var defaults = {
       connection: this.connection(),
-      model:      this.document(),
+      model:      this.reference(),
       path:       '/' + this.source()
     };
     options = extend({}, defaults, options);

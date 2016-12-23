@@ -245,7 +245,7 @@ class Payload {
       }]);
       return;
     }
-    var definition = entity.document().definition();
+    var definition = entity.self().definition();
     var data = this._data(entity);
     var link = this._link;
     if (this._link && entity.exists()) {
@@ -339,7 +339,7 @@ class Payload {
         if (!data.relationships[name].links) {
           data.relationships[name].links = {};
         }
-        data.relationships[name].links.related = this._relatedLink(entity.document().definition().relation(name).counterpart().name(), entity.id(), child);
+        data.relationships[name].links.related = this._relatedLink(entity.self().definition().relation(name).counterpart().name(), entity.id(), child);
       }
       if (child instanceof Model) {
         if (child.exists()) {
@@ -358,7 +358,7 @@ class Payload {
         }
       } else {
           if (child instanceof Through) {
-            through.push(entity.document().definition().relation(name));
+            through.push(entity.self().definition().relation(name));
           }
           for (var item of child) {
             if (item.exists()) {
@@ -404,7 +404,7 @@ class Payload {
    * @param String           The Resource name
    */
   _name(instance) {
-    return instance.document().name;
+    return instance.self().name;
   }
 
   /**
@@ -415,10 +415,10 @@ class Payload {
    * @return Object             The JSON-API formatted data.
    */
   _data(entity, attributes = true) {
-    var definition = entity.document().definition();
+    var definition = entity.self().definition();
     var key = definition.key();
 
-    var result = { type: definition.source() };
+    var result = { type: entity.self().name };
 
     if (entity.exists()) {
       result.id = entity.id();

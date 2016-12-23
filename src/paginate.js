@@ -42,18 +42,12 @@ class Paginate extends Document {
       items: []
     });
 
-    this.on('modified', (path) => {
-      if (path.length !== 2) {
-        return;
-      }
-      if (path[0] === 'query') {
-        if (path[1] === 'page') {
-          this.fetch();
-        }
-        if (path[1] === 'limit') {
-          this.set('query.page', 1);
-        }
-      }
+    this.watch('query.page', () => {
+      this.fetch();
+    });
+
+    this.watch('query.limit', () => {
+      this.set('query.page', 1);
     });
   }
 
@@ -130,5 +124,7 @@ class Paginate extends Document {
 }
 
 Paginate.limit = 10;
+
+Paginate.register();
 
 module.exports = Paginate;
