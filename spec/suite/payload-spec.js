@@ -351,6 +351,29 @@ describe("Payload", function() {
 
     });
 
+    it("filters out only `null` values", function() {
+
+      var image = this.image.create({
+        id: 1,
+        gallery_id: 0,
+        name: null,
+        title: ''
+      }, { exists: true });
+
+      var payload = new Payload();
+      payload.set(image);
+
+      expect(payload.data()).toEqual({
+        type: 'Image',
+        id: 1,
+        attributes: {
+          gallery_id: 0,
+          title: ''
+        }
+      });
+
+    });
+
   });
 
   describe(".parse()", function() {
