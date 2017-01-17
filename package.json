@@ -16,7 +16,6 @@
     "camel-case": "^3.0.0",
     "chaos-orm": "^10.0",
     "co": "^4.6.0",
-    "date-format": "0.0.2",
     "extend-merge": "^1.0.3",
     "trim-character": "^2.0.1"
   },
