@@ -339,7 +339,8 @@ class Payload {
         if (!data.relationships[name].links) {
           data.relationships[name].links = {};
         }
-        data.relationships[name].links.related = this._relatedLink(entity.self().definition().relation(name).counterpart().name(), entity.id(), child);
+        // Remove the `related` support for now, useless and Having issue with Single Table Inheritance.
+        //data.relationships[name].links.related = this._relatedLink(entity.self().definition().relation(name).counterpart().name(), entity.id(), child);
       }
       if (child instanceof Model) {
         if (child.exists()) {
