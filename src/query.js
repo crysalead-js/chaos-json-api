@@ -154,6 +154,10 @@ class Query {
       }
     }
 
+    if (this._embed.length) {
+      data.include = this._embed.join(',');
+    }
+
     if (Object.keys(data.filter).length === 0) {
       delete data.filter;
     }
