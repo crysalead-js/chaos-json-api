@@ -13,10 +13,10 @@
     "api"
   ],
   "dependencies": {
-    "camel-case": "^3.0.0",
     "chaos-orm": "^10.0",
     "co": "^4.6.0",
     "extend-merge": "^1.0.3",
+    "pascal-case": "^2.0.0",
     "trim-character": "^2.0.1"
   },
   "main": "src/index.js",

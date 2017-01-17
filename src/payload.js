@@ -1,4 +1,4 @@
-var camelize = require('camel-case');
+var pascalize = require('pascal-case');
 var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
 var Model = require('chaos-orm').Model;
@@ -249,7 +249,7 @@ class Payload {
     var data = this._data(entity);
     var link = this._link;
     if (this._link && entity.exists()) {
-      data.links.self = link(camelize(data.type), { id: entity.id() }, { absolute: true });
+      data.links.self = link(data.type, { id: entity.id() }, { absolute: true });
     }
 
     if (related) {
@@ -419,7 +419,7 @@ class Payload {
     var definition = entity.self().definition();
     var key = definition.key();
 
-    var result = { type: entity.self().name };
+    var result = { type: pascalize(definition.source(), true) };
 
     if (entity.exists()) {
       result.id = entity.id();
