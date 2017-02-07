@@ -206,22 +206,22 @@ class Schema extends BaseSchema {
    * @param Object response   The JSON-API error response payload
    */
   _manageErrors(collection, response) {
-    if (!response || !response.data || !response.data.errors) {
-      return;
+    if (response.data && response.data.errors) {
+      var errors = response.data.errors;
+      for (var error of errors) {
+        if (error.code !== 0) {
+          throw new Error(error.title);
+        }
+        var meta = error.meta;
+        if (collection.length !== meta.length) {
+          throw new Error('Error, received errors must have the same length as sent data.');
+        }
+        for (var i = 0, len = meta.length; i < len; i++) {
+          collection[i].invalidate(meta[i]);
+        }
+      }
     }
-    var errors = response.data.errors;
-    for (var error of errors) {
-      if (error.code !== 0) {
-        throw new Error(error.title);
-      }
-      var meta = error.meta;
-      if (collection.length !== meta.length) {
-        throw new Error('Error, received errors must have the same length as sent data.');
-      }
-      for (var i = 0, len = meta.length; i < len; i++) {
-        collection[i].invalidate(meta[i]);
-      }
-    }
+    throw response;
   }
 
   /**
