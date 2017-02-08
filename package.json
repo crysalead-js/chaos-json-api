@@ -13,7 +13,7 @@
     "api"
   ],
   "dependencies": {
-    "chaos-orm": "^10.0",
+    "chaos-orm": "^12.0",
     "co": "^4.6.0",
     "extend-merge": "^1.0.3",
     "pascal-case": "^2.0.0",
@@ -23,7 +23,7 @@
   "devDependencies": {
     "bluebird": "^3.4.6",
     "chai-kahlan": "^1.0.4",
-    "chaos-database": "^10.0.0",
+    "chaos-database": "^12.0.0",
     "coveralls": "^2.11.15",
     "jasmine-kahlan": "^1.0.2",
     "mocha": "^3.2.0",
