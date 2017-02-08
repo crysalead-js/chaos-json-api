@@ -1,7 +1,6 @@
 var co = require('co');
 var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
-var Collector = require('chaos-orm').Collector;
 var Payload = require('./payload');
 
 /**
@@ -96,6 +95,9 @@ class Query {
     this._page = [];
 
     for (var key in config.query) {
+      if (typeof this[key] !== 'function') {
+        throw new Error("Invalid option `'" + key + "'` as query options.");
+      }
       this[key](config.query[key]);
     }
   }
@@ -187,13 +189,9 @@ class Query {
   get(options) {
     return co(function*(){
       var defaults = {
-        collector: undefined,
         return:    'entity'
       };
       options = extend({}, defaults, options);
-
-      var classname = this.constructor.classes().collector;
-      var collector = options.collector = options.collector ? options.collector : new classname();
 
       var collection;
       var ret = options['return'];
@@ -205,9 +203,6 @@ class Query {
 
       switch (ret) {
         case 'entity':
-          var source = schema.source();
-          var key = schema.key();
-
           var model = this.model();
           if (!model) {
             throw new Error("Missing model for this query, set `'return'` to `'object'` to get row data.");
@@ -215,7 +210,6 @@ class Query {
 
           collection = model.create(data, {
             meta: payload.meta(),
-            collector: collector,
             type: 'set',
             exists: true
           });
@@ -439,14 +433,5 @@ class Query {
   }
 
 }
-
-/**
- * Class dependencies.
- *
- * @var array
- */
-Query._classes = {
-  collector: Collector
-};
 
 module.exports = Query;
