@@ -230,6 +230,21 @@ class Payload {
   }
 
   /**
+   * Wrap the model exists method.
+   * Assume a `false` existance when the exists value can't be determined.
+   *
+   * @param  Object  entity The Chaos entity to check.
+   * @return Boolean
+   */
+  _exists(entity) {
+    try {
+      return entity.exists();
+    } catch(e) {
+      return false;
+    }
+  }
+
+  /**
    * Helper for `JsonApi::push()`.
    *
    * @param  Object  entity       The Chaos entity to push in the payload.
@@ -288,31 +303,26 @@ class Payload {
    * @param  Object  data      The data array to be populated.
    */
   _populateRelationships(entity, relations, data) {
-      var through = [];
+    var through = [];
 
-      for (var name of relations) {
-        this._populateRelationship(entity, name, data, through);
-      }
-      if (data.relationships) {
-        for (let key in data.relationships) {
-          if (data.relationships[key] == null) {
-            delete data.relationships[key];
-          }
-        }
-        for (let rel of through) {
-          delete data.relationships[rel.through()];
+    for (var name of relations) {
+      this._populateRelationship(entity, name, data, through);
+    }
+    if (data.relationships) {
+      for (let key in data.relationships) {
+        if (data.relationships[key] == null) {
+          delete data.relationships[key];
         }
       }
-      if (data.attributes) {
-        for (let key in data.attributes) {
-          if (data.attributes[key] == null) {
-            delete data.attributes[key];
-          }
-        }
-        for (let rel of through) {
-          delete data.attributes[rel.through()];
-        }
+      for (let rel of through) {
+        delete data.relationships[rel.through()];
       }
+    }
+    if (data.attributes) {
+      for (let rel of through) {
+        delete data.attributes[rel.through()];
+      }
+    }
   }
 
   /**
@@ -324,63 +334,66 @@ class Payload {
    * @param  Array   through The through array to be populated with pivot tables.
    */
   _populateRelationship(entity, name, data, through) {
-      if (!entity.has(name)) {
-        return;
+    if (!entity.has(name)) {
+      return;
+    }
+    var child = entity.get(name);
+    if (!child) {
+      return;
+    }
+    var link = this._link;
+    if (link) {
+      if (!data.relationships) {
+        data.relationships = {};
       }
-      var child = entity.get(name);
-      var link = this._link;
-      if (link) {
+      if (!data.relationships[name]) {
+        data.relationships[name] = {};
+      }
+      if (!data.relationships[name].links) {
+        data.relationships[name].links = {};
+      }
+      // Remove the `related` support for now, useless and Having issue with Single Table Inheritance.
+      //data.relationships[name].links.related = this._relatedLink(entity.self().definition().relation(name).counterpart().name(), entity.id(), child);
+    }
+    if (child instanceof Model) {
+      if (this._exists(child)) {
         if (!data.relationships) {
           data.relationships = {};
         }
         if (!data.relationships[name]) {
           data.relationships[name] = {};
         }
-        if (!data.relationships[name].links) {
-          data.relationships[name].links = {};
-        }
-        // Remove the `related` support for now, useless and Having issue with Single Table Inheritance.
-        //data.relationships[name].links.related = this._relatedLink(entity.self().definition().relation(name).counterpart().name(), entity.id(), child);
-      }
-      if (child instanceof Model) {
-        if (child.exists()) {
-          if (!data.relationships) {
-            data.relationships = {};
-          }
-          if (!data.relationships[name]) {
-            data.relationships[name] = {};
-          }
-          data.relationships[name].data = this._push(child, true);
-        } else {
-          if (!data.attributes) {
-            data.attributes = {};
-          }
-          data.attributes[name] = child.to('array', { embed: false });
-        }
+        data.relationships[name].data = this._push(child, true);
       } else {
-          if (child instanceof Through) {
-            through.push(entity.self().definition().relation(name));
-          }
-          for (var item of child) {
-            if (item.exists()) {
-              if (!data.relationships) {
-                data.relationships = {};
-              }
-              if (!data.relationships[name]) {
-                data.relationships[name] = { data: [] };
-              }
-              data.relationships[name].data.push(this._push(item, true));
-            } else {
-              if (!data.attributes) {
-                data.attributes = {};
-              }
-              if (!data.attributes[name]) {
-                data.attributes[name] = [];
-              }
-              data.attributes[name].push(item.to('array', { embed: false }));
-            }
-          }
+        if (!data.attributes) {
+          data.attributes = {};
+        }
+        data.attributes[name] = child.to('array', { embed: false });
       }
+    } else {
+        if (child instanceof Through) {
+          through.push(entity.self().definition().relation(name));
+        }
+        for (var item of child) {
+          if (this._exists(item)) {
+            if (!data.relationships) {
+              data.relationships = {};
+            }
+            if (!data.relationships[name]) {
+              data.relationships[name] = { data: [] };
+            }
+            data.relationships[name].data.push(this._push(item, true));
+          } else {
+            if (!data.attributes) {
+              data.attributes = {};
+            }
+            if (!data.attributes[name]) {
+              data.attributes[name] = [];
+            }
+            data.attributes[name].push(item.to('array', { embed: false }));
+          }
+        }
+    }
   }
 
   /**
@@ -438,7 +451,6 @@ class Payload {
     delete attrs[key];
 
     result.attributes = attrs;
-
     return result;
   }
 

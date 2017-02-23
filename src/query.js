@@ -211,7 +211,7 @@ class Query {
           collection = model.create(data, {
             meta: payload.meta(),
             type: 'set',
-            exists: true
+            exists: 'all'
           });
 
           break;

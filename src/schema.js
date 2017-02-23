@@ -150,9 +150,9 @@ class Schema extends BaseSchema {
         return true;
       }
       var payload = new Payload();
-      payload.set(new Collection({data: inserts}));
+      payload.set(new Collection({ data: inserts }));
       try {
-        this._sync(inserts, yield this.connection().post('/' + this.source(), payload.serialize()), {exists: true});
+        this._amend(inserts, yield this.connection().post('/' + this.source(), payload.serialize()), { exists: true });
       } catch (response) {
         this._manageErrors(inserts, response);
       }
@@ -172,9 +172,9 @@ class Schema extends BaseSchema {
         return true;
       }
       var payload = new Payload();
-      payload.set(new Collection({data: updates}));
+      payload.set(new Collection({ data: updates }));
       try {
-        this._sync(updates, yield this.connection().patch('/' + this.source(), payload.serialize()));
+        this._amend(updates, yield this.connection().patch('/' + this.source(), payload.serialize()));
       } catch (response) {
         this._manageErrors(updates, response);
       }
@@ -186,16 +186,16 @@ class Schema extends BaseSchema {
    *
    * @param Array  collection The sent collection
    * @param Object response   The JSON-API response payload
-   * @param Object options    Some additionnal sync options
+   * @param Object options    Some additionnal amend options
    */
-  _sync(collection, response, options) {
+  _amend(collection, response, options) {
     options = options || {};
-    var result = Payload.parse(extend({data:[]}, response)).export();
+    var result = Payload.parse(extend({ data:[] }, response)).export();
     if (collection.length !== result.length) {
       throw new Error('Error, received data must have the same length as sent data.');
     }
     for (var i = 0, len = result.length; i < len; i++) {
-      collection[i].sync(null, result[i], options);
+      collection[i].amend(result[i], options);
     }
   }
 

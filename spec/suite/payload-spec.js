@@ -199,6 +199,7 @@ describe("Payload", function() {
         type: 'Image',
         attributes: {
           title: 'Amiga 1200',
+          gallery_id: null,
           gallery: {
             name: 'Gallery 1'
           },
@@ -351,7 +352,7 @@ describe("Payload", function() {
 
     });
 
-    it("filters out only `null` values", function() {
+    it("doesn't filters out `null` values", function() {
 
       var image = this.image.create({
         id: 1,
@@ -368,6 +369,7 @@ describe("Payload", function() {
         id: 1,
         attributes: {
           gallery_id: 0,
+          name: null,
           title: ''
         }
       });
