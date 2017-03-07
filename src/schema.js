@@ -131,7 +131,7 @@ class Schema extends BaseSchema {
    * @param  Object  options Options array.
    * @return Promise         Returns a promise.
    */
-  persist(instance, types, options) {
+  saveRelation(instance, types, options) {
     return co(function*() {
       return true;
     }.bind(this));
