@@ -270,12 +270,8 @@ class Payload {
     if (related) {
       this._store(extend({}, data));
       delete data.attributes;
+      delete data.relationships;
       delete data.links;
-    } else {
-      var relations = definition.relations();
-      if (relations.length) {
-        this._populateRelationships(entity, relations, data);
-      }
     }
 
     return data;
@@ -313,9 +309,6 @@ class Payload {
         if (data.relationships[key] == null) {
           delete data.relationships[key];
         }
-      }
-      for (let rel of through) {
-        delete data.relationships[rel.through()];
       }
     }
     if (data.attributes) {
@@ -371,28 +364,31 @@ class Payload {
         data.attributes[name] = child.to('array', { embed: false });
       }
     } else {
-        if (child instanceof Through) {
-          through.push(entity.self().definition().relation(name));
-        }
-        for (var item of child) {
-          if (this._exists(item)) {
-            if (!data.relationships) {
-              data.relationships = {};
-            }
+      var isThrough = child instanceof Through;
+      if (isThrough) {
+        through.push(entity.self().definition().relation(name));
+      }
+      for (var item of child) {
+        if (this._exists(item)) {
+          if (!data.relationships) {
+            data.relationships = {};
+          }
+          if (!isThrough) {
             if (!data.relationships[name]) {
               data.relationships[name] = { data: [] };
             }
             data.relationships[name].data.push(this._push(item, true));
-          } else {
-            if (!data.attributes) {
-              data.attributes = {};
-            }
-            if (!data.attributes[name]) {
-              data.attributes[name] = [];
-            }
-            data.attributes[name].push(item.to('array', { embed: false }));
           }
+        } else {
+          if (!data.attributes) {
+            data.attributes = {};
+          }
+          if (!data.attributes[name]) {
+            data.attributes[name] = [];
+          }
+          data.attributes[name].push(item.to('array', { embed: false }));
         }
+      }
     }
   }
 
@@ -451,6 +447,11 @@ class Payload {
     delete attrs[key];
 
     result.attributes = attrs;
+
+    var relations = definition.relations();
+    if (relations.length) {
+      this._populateRelationships(entity, relations, result);
+    }
     return result;
   }
 

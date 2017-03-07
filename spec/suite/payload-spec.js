@@ -245,13 +245,13 @@ describe("Payload", function() {
                 id: 1
               }
             },
-            tags: {
+            images_tags: {
               data: [{
-                type: 'Tag',
+                type: 'ImageTag',
                 id: 1
               }, {
-                type: 'Tag',
-                id: 3
+                type: 'ImageTag',
+                id: 2
               }]
             }
           }
@@ -265,11 +265,31 @@ describe("Payload", function() {
               name: 'Foo Gallery'
             }
           }, {
+            type: 'Tag',
+            id: 1,
+            attributes: {
+              name: 'High Tech'
+            }
+          }, {
             type: 'ImageTag',
             id: 1,
             attributes: {
               image_id: 1,
               tag_id: 1
+            },
+            relationships: {
+              tag: {
+                data: {
+                  type: 'Tag',
+                  id: 1
+                }
+              }
+            }
+          }, {
+            type: 'Tag',
+            id: 3,
+            attributes: {
+              name: 'Computer'
             }
           }, {
             type: 'ImageTag',
@@ -277,18 +297,14 @@ describe("Payload", function() {
             attributes: {
               image_id: 1,
               tag_id: 3
-            }
-          }, {
-            type: 'Tag',
-            id: 1,
-            attributes: {
-              name: 'High Tech'
-            }
-          }, {
-            type: 'Tag',
-            id: 3,
-            attributes: {
-              name: 'Computer'
+            },
+            relationships: {
+              tag: {
+                data: {
+                  type: 'Tag',
+                  id: 3
+                }
+              }
             }
           }
         ]);
