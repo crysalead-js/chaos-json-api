@@ -114,17 +114,23 @@ class Payload {
     this._link = null;
 
     /**
-     * Data exporter handler.
+     * Data importer handler.
      */
-    this._exporter = null;
+    this._importer = null;
 
     var defaults = {
       key: 'id',
       keys: {},
       data: {},
       link: null,
-      exporter: function(entity) {
+      importer: function(entity) {
         return entity.to('array', { embed: false });
+      },
+      exporter: function(model, data, options) {
+          if (!model) {
+              return data;
+          }
+          return model.create(data, options);
       }
     };
 
@@ -143,6 +149,7 @@ class Payload {
     this._key = config.key;
     this._keys = config.keys;
     this._link = config.link;
+    this._importer = config.importer;
     this._exporter = config.exporter;
 
     this.jsonapi(config.data.jsonapi);
@@ -349,44 +356,27 @@ class Payload {
       //data.relationships[name].links.related = this._relatedLink(entity.self().definition().relation(name).counterpart().name(), entity.id(), child);
     }
     if (child instanceof Model) {
-      if (this._exists(child)) {
-        if (!data.relationships) {
-          data.relationships = {};
-        }
-        if (!data.relationships[name]) {
-          data.relationships[name] = {};
-        }
-        data.relationships[name].data = this._push(child, true);
-      } else {
-        if (!data.attributes) {
-          data.attributes = {};
-        }
-        data.attributes[name] = child.to('array', { embed: false });
+      if (!data.relationships) {
+        data.relationships = {};
       }
+      if (!data.relationships[name]) {
+        data.relationships[name] = {};
+      }
+      data.relationships[name].data = this._push(child, this._exists(child));
     } else {
       var isThrough = child instanceof Through;
       if (isThrough) {
         through.push(entity.self().definition().relation(name));
       }
       for (var item of child) {
-        if (this._exists(item)) {
-          if (!data.relationships) {
-            data.relationships = {};
+        if (!data.relationships) {
+          data.relationships = {};
+        }
+        if (!isThrough) {
+          if (!data.relationships[name]) {
+            data.relationships[name] = { data: [] };
           }
-          if (!isThrough) {
-            if (!data.relationships[name]) {
-              data.relationships[name] = { data: [] };
-            }
-            data.relationships[name].data.push(this._push(item, true));
-          }
-        } else {
-          if (!data.attributes) {
-            data.attributes = {};
-          }
-          if (!data.attributes[name]) {
-            data.attributes[name] = [];
-          }
-          data.attributes[name].push(item.to('array', { embed: false }));
+          data.relationships[name].data.push(this._push(item, this._exists(item)));
         }
       }
     }
@@ -430,8 +420,12 @@ class Payload {
 
     var result = { type: pascalize(definition.source(), true) };
 
-    if (entity.exists()) {
-      result.id = entity.id();
+    var id = entity.id();
+    if (id != null) {
+      result.id = id;
+      result.exists = entity.exists();
+    } else {
+      result.exists = false;
     }
 
     if (!attributes) {
@@ -439,8 +433,8 @@ class Payload {
     }
 
     var attrs = {};
-    var exporter = this._exporter;
-    var data = exporter(entity);
+    var importer = this._importer;
+    var data = importer(entity);
     for (var name in data) {
       attrs[name] = data[name];
     }
@@ -485,9 +479,9 @@ class Payload {
   /**
    * Exports a JSON-API item data into a nested from array.
    */
-  export(id) {
+  export(id, model) {
     var collection;
-    if (id === undefined) {
+    if (id == undefined) {
       collection = this.data();
       collection = this._dataCache.length === 1 ? [collection] : collection;
     } else {
@@ -496,8 +490,9 @@ class Payload {
       }
       collection = [this._dataCache[this._indexed[id]]];
     }
-
     var values = [];
+    var options = {};
+
     for (var data of collection) {
       var type = data.type;
       var key = this._keys[type] ? this._keys[type] : this._key;
@@ -511,47 +506,76 @@ class Payload {
         indexes = {};
       }
 
+      options.exists = !!data.exists;
+
       result = extend({}, data.attributes, result);
+
+      var exporter = this._exporter;
+      result = exporter(model, result, options);
+      var schema = model ? model.definition() : undefined;
 
       if (data.relationships) {
         for (var key in data.relationships) {
-          result[key] = this._relationship(data.relationships[key].data, indexes);
+          var to = schema ? schema.relation(key).to() : undefined;
+          if (model) {
+            result.set(key, this._relationship(data.relationships[key].data, indexes, to));
+          } else {
+            result[key] = this._relationship(data.relationships[key].data, indexes, to);
+          }
         }
       }
       values.push(result);
     }
-    return values;
+    return id == undefined ? values : values[0];
   }
 
   /**
    * Helper for `JsonApi::export()`.
    */
-  _relationship(collection, indexes) {
+  _relationship(collection, indexes, model) {
     var isCollection = Array.isArray(collection);
     var collection = isCollection ? collection : [collection];
     var values = [];
+    var options = {};
+    var exporter = this._exporter;
+    var schema = model ? model.definition() : undefined;
+    var relationships;
+    var result;
 
     for (var data of collection) {
-      if (indexes[data.type] && indexes[data.type][data.id]) {
-        continue;
+      options.exists = !!data.exists;
+      if (data.id != null) {
+        if (indexes[data.type] && indexes[data.type][data.id]) {
+          continue;
+        }
+        if (!indexes[data.type]) {
+          indexes[data.type] = {};
+        }
+        indexes[data.type][data.id] = true;
+        if (!this._storeCache[data.type] || !this._storeCache[data.type][data.id]) {
+          continue;
+        }
+        result = this._storeCache[data.type][data.id];
+        if (this._relationships[data.type] && this._relationships[data.type][data.id]) {
+          relationships = this._relationships[data.type][data.id];
+        } else {
+          relationships = [];
+        }
+      } else {
+        result = data.attributes ? data.attributes : [];
+        relationships = data.relationships ? data.relationships : [];
       }
-      if (!indexes[data.type]) {
-        indexes[data.type] = {};
-      }
-      indexes[data.type][data.id] = true;
-      if (!this._storeCache[data.type] || !this._storeCache[data.type][data.id]) {
-        continue;
-      }
-      var result = this._storeCache[data.type][data.id];
-      if (this._relationships[data.type] && this._relationships[data.type][data.id]) {
-        for (var key in this._relationships[data.type][data.id]) {
-          var item = this._relationship(this._relationships[data.type][data.id][key].data, indexes);
-          if (item) {
-            result[key] = item;
-          }
+
+      for (var key in relationships) {
+        var value = relationships[key];
+        var to = schema ? schema.relation(key).to() : undefined;
+        var item = this._relationship(value.data, indexes, to);
+        if (item) {
+          result[key] = item;
         }
       }
-      values.push(result);
+
+      values.push(exporter(model, result, options));
     }
     return isCollection ? values : values[0];
   }
