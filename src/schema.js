@@ -152,7 +152,8 @@ class Schema extends BaseSchema {
       var payload = new Payload();
       payload.set(new Collection({ data: inserts }));
       try {
-        this._amend(inserts, yield this.connection().post('/' + this.source(), payload.serialize()), { exists: true });
+        var json = yield this.connection().post('/' + this.source(), payload.serialize());
+        this._amendCollection(inserts, Payload.parse(extend({ data:[] }, json)).export(), { exists: true });
       } catch (response) {
         this._manageErrors(inserts, response);
       }
@@ -174,7 +175,8 @@ class Schema extends BaseSchema {
       var payload = new Payload();
       payload.set(new Collection({ data: updates }));
       try {
-        this._amend(updates, yield this.connection().patch('/' + this.source(), payload.serialize()));
+        var json = yield this.connection().patch('/' + this.source(), payload.serialize());
+        this._amendCollection(updates, Payload.parse(extend({ data:[] }, json)).export(), { exists: true });
       } catch (response) {
         this._manageErrors(updates, response);
       }
@@ -188,14 +190,14 @@ class Schema extends BaseSchema {
    * @param Object response   The JSON-API response payload
    * @param Object options    Some additionnal amend options
    */
-  _amend(collection, response, options) {
+  _amendCollection(collection, data, options) {
     options = options || {};
-    var result = Payload.parse(extend({ data:[] }, response)).export();
-    if (collection.length !== result.length) {
+    if (collection.length !== data.length) {
       throw new Error('Error, received data must have the same length as sent data.');
     }
-    for (var i = 0, len = result.length; i < len; i++) {
-      collection[i].amend(result[i], options);
+    for (var i = 0, len = data.length; i < len; i++) {
+      var entity = collection[i];
+      entity.amend(data[i], options);
     }
   }
 
