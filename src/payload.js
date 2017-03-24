@@ -124,7 +124,7 @@ class Payload {
       data: {},
       link: null,
       importer: function(entity) {
-        return entity.to('array', { embed: false });
+        return entity.to('datasource', { embed: false });
       },
       exporter: function(model, data, options) {
           if (!model) {
