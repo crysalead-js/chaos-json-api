@@ -368,14 +368,14 @@ class Payload {
       if (isThrough) {
         through.push(entity.self().definition().relation(name));
       }
-      for (var item of child) {
-        if (!data.relationships) {
-          data.relationships = {};
+      if (!data.relationships) {
+        data.relationships = {};
+      }
+      if (!isThrough) {
+        if (!data.relationships[name]) {
+          data.relationships[name] = { data: [] };
         }
-        if (!isThrough) {
-          if (!data.relationships[name]) {
-            data.relationships[name] = { data: [] };
-          }
+        for (var item of child) {
           data.relationships[name].data.push(this._push(item, this._exists(item)));
         }
       }
