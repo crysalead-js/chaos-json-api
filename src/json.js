@@ -129,7 +129,7 @@ class JsonApi extends Source {
    * @return Object
    */
   _handlers() {
-    return {
+    return merge({}, super._handlers(), {
       cast: {
         'string': function(value, options) {
           return String(value);
@@ -158,12 +158,37 @@ class JsonApi extends Source {
           return null;
         }
       },
-      datasource: {
+      json: {
         'string': function string(value, options) {
-          return value instanceof Date ? value.toISOString().substring(0, 19).replace('T', ' ') : String(value);
+          return String(value);
+        },
+        'integer': function(value, options) {
+          return Number.parseInt(value);
+        },
+        'float': function(value, options) {
+          return Number.parseFloat(value);
+        },
+        'date': function(value, options) {
+          options = options || {};
+          options.format = options.format ? options.format : 'yyyy-mm-dd';
+          return this.convert('array', 'datetime', value, options);
+        }.bind(this),
+        'datetime': function(value, options) {
+          options = options || {};
+          options.format = options.format ? options.format : 'yyyy-mm-dd HH:MM:ss';
+          if (!(value instanceof Date)) {
+            value = new Date(value);
+          }
+          return dateFormat(value, options.format);
+        },
+        'boolean': function(value, options) {
+          return !!value;
+        },
+        'null': function(value, options) {
+          return null;
         }
       }
-    };
+    });
   }
 
   /**

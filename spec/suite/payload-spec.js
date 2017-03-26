@@ -39,6 +39,8 @@ describe("Payload", function() {
       this.image_tag = this.fixtures.get('image_tag').model();
       this.tag = this.fixtures.get('tag').model();
 
+      this.payload = new Payload();
+
     }.bind(this)).then(function() {
       done();
     });
@@ -57,10 +59,9 @@ describe("Payload", function() {
 
     it("sets an error with trying to add a non Chaos entity", function() {
 
-      var payload = new Payload();
-      payload.set({hello: 'world'});
+      this.payload.set({ hello: 'world' });
 
-      expect(payload.errors()).toEqual([{
+      expect(this.payload.errors()).toEqual([{
         status: 500,
         code: 500,
         message: 'The JSON-API serializer only supports Chaos entities.'
@@ -78,10 +79,9 @@ describe("Payload", function() {
         var gallery = this.gallery.create();
         yield gallery.validates();
 
-        var payload = new Payload();
-        payload.set(gallery);
+        this.payload.set(gallery);
 
-        expect(payload.errors()).toEqual([{
+        expect(this.payload.errors()).toEqual([{
           status: 422,
           code: 0,
           title: 'Validation Error',
@@ -107,10 +107,9 @@ describe("Payload", function() {
       co(function*() {
         yield this.fixtures.populate('image');
 
-        var payload = new Payload();
         var images = yield this.image.all();
-        payload.delete(images);
-        expect(payload.serialize()).toEqual({
+        this.payload.delete(images);
+        expect(this.payload.serialize()).toEqual({
           data: [
             { type: 'Image', id: 1, exists: true },
             { type: 'Image', id: 2, exists: true },
@@ -180,10 +179,9 @@ describe("Payload", function() {
       image.get('tags').push(this.tag.create({ id:2, name: 'Science' }, { exists: true }));
       image.set('gallery', { name: 'Gallery 1' });
 
-      var payload = new Payload();
-      payload.set(image);
+      this.payload.set(image);
 
-      var item = payload.export(undefined, this.image)[0];
+      var item = this.payload.export(undefined, this.image)[0];
 
       expect(item.data()).toEqual({
         gallery_id: null,
@@ -234,9 +232,7 @@ describe("Payload", function() {
 
     it("serializes an empty payload", function() {
 
-      var payload = new Payload();
-
-      expect(payload.serialize()).toEqual({
+      expect(this.payload.serialize()).toEqual({
         data: []
       });
 
@@ -251,9 +247,8 @@ describe("Payload", function() {
       image.get('tags').push({ name: 'Science' });
       image.set('gallery', { name: 'Gallery 1' });
 
-      var payload = new Payload();
-      payload.set(image);
-      expect(payload.data()).toEqual({
+      this.payload.set(image);
+      expect(this.payload.data()).toEqual({
         type: 'Image',
         exists: false,
         attributes: {
@@ -313,7 +308,7 @@ describe("Payload", function() {
         }
       });
 
-      expect(payload.included()).toEqual([]);
+      expect(this.payload.included()).toEqual([]);
 
     });
 
@@ -327,10 +322,9 @@ describe("Payload", function() {
       image.get('tags').push(this.tag.create({ id:2, name: 'Science' }, { exists: true }));
       image.set('gallery', { name: 'Gallery 1' });
 
-      var payload = new Payload();
-      payload.set(image);
+      this.payload.set(image);
 
-      expect(payload.data()).toEqual({
+      expect(this.payload.data()).toEqual({
         type: 'Image',
         exists: false,
         attributes: {
@@ -386,7 +380,7 @@ describe("Payload", function() {
         }
       });
 
-      expect(payload.included()).toEqual([
+      expect(this.payload.included()).toEqual([
         {
           type: 'Tag',
           id: 1,
@@ -417,12 +411,11 @@ describe("Payload", function() {
 
         var image = yield this.image.load(1, { embed: ['gallery', 'tags'] });
 
-        var payload = new Payload();
-        payload.set(image);
+        this.payload.set(image);
 
-        expect(payload.isCollection()).toBe(false);
+        expect(this.payload.isCollection()).toBe(false);
 
-        expect(payload.data()).toEqual({
+        expect(this.payload.data()).toEqual({
           type: 'Image',
           id: 1,
           exists: true,
@@ -453,7 +446,7 @@ describe("Payload", function() {
           }
         });
 
-        expect(payload.included()).toEqual([
+        expect(this.payload.included()).toEqual([
           {
             type: 'Gallery',
             id: 1,
@@ -524,12 +517,11 @@ describe("Payload", function() {
         var images = yield this.image.find().where({ id: [1 , 2] }).all();
         images.meta({ count: 10 });
 
-        var payload = new Payload();
-        payload.set(images);
+        this.payload.set(images);
 
-        expect(payload.isCollection()).toBe(true);
+        expect(this.payload.isCollection()).toBe(true);
 
-        expect(payload.data()).toEqual([
+        expect(this.payload.data()).toEqual([
           {
             type: 'Image',
             id: 1,
@@ -551,9 +543,9 @@ describe("Payload", function() {
           }
         ]);
 
-        expect(payload.included()).toEqual([]);
+        expect(this.payload.included()).toEqual([]);
 
-        expect(payload.meta()).toEqual({ count: 10 });
+        expect(this.payload.meta()).toEqual({ count: 10 });
 
       }.bind(this)).then(function() {
         done();
@@ -582,10 +574,9 @@ describe("Payload", function() {
         title: ''
       }, { exists: true });
 
-      var payload = new Payload();
-      payload.set(image);
+      this.payload.set(image);
 
-      expect(payload.data()).toEqual({
+      expect(this.payload.data()).toEqual({
         type: 'Image',
         id: 1,
         exists: true,
