@@ -239,9 +239,14 @@ class Schema extends BaseSchema {
       payload.delete(instance);
       try {
         yield this.connection().delete('/' + this.source(), payload.serialize());
-        return true;
       } catch (response) {
-        return false;
+        if (response.data && response.data.errors) {
+          var errors = response.data.errors;
+          for (var error of errors) {
+            throw new Error(error.title);
+          }
+        }
+        throw new Error('Unexpected error');
       }
     }.bind(this));
   }
