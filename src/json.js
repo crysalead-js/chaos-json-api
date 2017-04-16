@@ -22,7 +22,7 @@ function queryStringify(obj, prefix) {
 /**
  * An adapter base class for SQL based driver
  */
-class JsonApi extends Source {
+class Json extends Source {
   /**
    * Gets/sets class dependencies.
    *
@@ -60,7 +60,10 @@ class JsonApi extends Source {
       port:     undefined,
       username: undefined,
       password: undefined,
-      headers:  {}
+      headers:  {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      }
     };
     config = extend({}, defaults, config);
 
@@ -350,8 +353,8 @@ class JsonApi extends Source {
  *
  * @var array
  */
-JsonApi._classes = {
+Json._classes = {
   schema: Schema
 };
 
-module.exports = JsonApi;
+module.exports = Json;
