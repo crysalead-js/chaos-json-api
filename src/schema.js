@@ -236,6 +236,9 @@ class Schema extends BaseSchema {
   delete(instance) {
     return co(function*() {
       var payload = new Payload();
+      if ((Array.isArray(instance) || instance instanceof Collection) && !instance.length) {
+        return;
+      }
       payload.delete(instance);
       try {
         yield this.connection().delete('/' + this.source(), payload.serialize());
