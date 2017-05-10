@@ -177,6 +177,16 @@ class Query {
       data.page.limit = this._page.limit;
     }
 
+    var sort = [];
+
+    this._order.forEach(function (dir, key) {
+      sort.push(dir === 'DESC' ? '-' + key : key);
+    });
+
+    if (sort.length) {
+      data.sort = sort.join(',');
+    }
+
     return data;
   }
 
@@ -341,7 +351,7 @@ class Query {
       var value = fields[i];
       if (value && value.constructor === Object) {
         var key = Object.keys(value)[0];
-        result.set(key, value[key]);
+        result.set(key, value[key].toUpperCase());
         continue;
       }
       var matches = value.match(/^(.*?)\s+((?:a|de)sc)/i);
@@ -352,7 +362,7 @@ class Query {
       } else {
         dir = direction;
       }
-      result.set(value, dir);
+      result.set(value, dir.toUpperCase());
     }
     return result;
   }
