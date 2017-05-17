@@ -202,18 +202,6 @@ class Json extends Source {
   }
 
   /**
-   * Formats a value according to its definition.
-   *
-   * @param  String mode  The format mode (i.e. `'cast'` or `'datasource'`).
-   * @param  String type  The type name.
-   * @param  mixed  value The value to format.
-   * @return mixed        The formated value.
-   */
-  format(mode, type, value, options) {
-    return super.format(mode, type, value, options);
-  }
-
-  /**
    * Send request and return response data. Will open the connection if
    * needed and always close it after sending the request.
    *

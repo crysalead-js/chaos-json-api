@@ -127,10 +127,10 @@ class Payload {
         return entity.to('json', { embed: false });
       },
       exporter: function(model, data, options) {
-          if (!model) {
-              return data;
-          }
-          return model.create(data, options);
+        if (!model) {
+          return data;
+        }
+        return model.create(data, options);
       }
     };
 
