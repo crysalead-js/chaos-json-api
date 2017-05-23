@@ -2,7 +2,7 @@ var co = require('co');
 var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
 var Source = require('chaos-orm').Source;
-var dateformat = require('date-format');
+var dateFormat = require('date-format');
 var trim = require('trim-character');
 var Schema = require('./schema');
 
@@ -109,6 +109,15 @@ class Json extends Source {
     this.formatter('array', 'serial', handlers.array['integer']);
     this.formatter('cast', 'id',      handlers.cast['integer']);
     this.formatter('cast', 'serial',  handlers.cast['integer']);
+
+    this.formatter('json', 'object',   handlers.json['object']);
+    this.formatter('json', 'string',   handlers.json['string']);
+    this.formatter('json', 'integer',  handlers.json['integer']);
+    this.formatter('json', 'float',    handlers.json['float']);
+    this.formatter('json', 'date',     handlers.json['date']);
+    this.formatter('json', 'datetime', handlers.json['datetime']);
+    this.formatter('json', 'boolean',  handlers.json['boolean']);
+    this.formatter('json', 'null',     handlers.json['null']);
   }
 
   /**
@@ -169,6 +178,9 @@ class Json extends Source {
         }
       },
       json: {
+        'object': function(value, options) {
+          return value.to('json', options);
+        },
         'string': function string(value, options) {
           return String(value);
         },
