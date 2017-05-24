@@ -15,6 +15,7 @@
   "dependencies": {
     "chaos-orm": "^13.0",
     "co": "^4.6.0",
+    "dateformat": "^2.0.0",
     "extend-merge": "^1.0.5",
     "pascal-case": "^2.0.1",
     "trim-character": "^2.0.1"

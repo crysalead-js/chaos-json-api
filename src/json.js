@@ -2,7 +2,7 @@ var co = require('co');
 var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
 var Source = require('chaos-orm').Source;
-var dateFormat = require('date-format');
+var dateformat = require('dateformat');
 var trim = require('trim-character');
 var Schema = require('./schema');
 
@@ -201,7 +201,7 @@ class Json extends Source {
           if (!(value instanceof Date)) {
             value = new Date(value);
           }
-          return dateFormat(value, options.format);
+          return dateformat(value, options.format);
         },
         'boolean': function(value, options) {
           return !!value;
