@@ -1,6 +1,6 @@
 {
   "name": "chaos-json-api",
-  "version": "2.0.0",
+  "version": "3.0.0",
   "description": "JSON API adapter for Chaos ORM.",
   "license": "MIT",
   "repository": {
@@ -13,7 +13,7 @@
     "api"
   ],
   "dependencies": {
-    "chaos-orm": "^13.0",
+    "chaos-orm": "^14.0",
     "co": "^4.6.0",
     "dateformat": "^2.0.0",
     "extend-merge": "^1.0.5",
@@ -24,13 +24,13 @@
   "devDependencies": {
     "bluebird": "^3.5.0",
     "chai-kahlan": "^1.0.4",
-    "chaos-database": "^13.0.0",
-    "coveralls": "^2.13.0",
+    "chaos-database": "^14.0.0",
+    "coveralls": "^2.13.1",
     "jasmine-kahlan": "^1.0.2",
-    "mocha": "^3.2.0",
-    "sql-dialect": "^4.0.1",
+    "mocha": "^3.4.2",
+    "sql-dialect": "^4.0.4",
     "sqlite3": "^3.1.8",
-    "nyc": "^10.2.0"
+    "nyc": "^10.3.2"
   },
   "scripts": {
     "coverage-report": "nyc --reporter=lcov mocha",
