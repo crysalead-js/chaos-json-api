@@ -223,7 +223,9 @@ class Schema extends BaseSchema {
         }
       }
     }
-    throw response;
+    var error = new Error('Error, please check invalid input.');
+    error.data = response.data;
+    throw error;
   }
 
   /**
