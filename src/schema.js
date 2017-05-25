@@ -208,24 +208,32 @@ class Schema extends BaseSchema {
    * @param Object response   The JSON-API error response payload
    */
   _manageErrors(collection, response) {
+    var exception = new Error();
+    exception.data = response.data;
+
     if (response.data && response.data.errors) {
       var errors = response.data.errors;
       for (var error of errors) {
-        if (error.code !== 0) {
-          throw new Error(error.title);
+        if (error.code !== 422) {
+          exception.message = error.title;
+          break;
         }
-        var meta = error.meta;
-        if (collection.length !== meta.length) {
-          throw new Error('Error, received errors must have the same length as sent data.');
+        exception.message = 'Error, please check invalid input.';
+
+        var data = error.data;
+        if (collection.length !== data.length) {
+          exception.message = 'Error, received errors must have the same length as sent data.';
+          break;
         }
-        for (var i = 0, len = meta.length; i < len; i++) {
-          collection[i].invalidate(meta[i]);
+        for (var i = 0, len = data.length; i < len; i++) {
+          collection[i].invalidate(data[i]);
         }
       }
+    } else {
+      exception.message = 'An unknown error has occurred.';
     }
-    var error = new Error('Error, please check invalid input.');
-    error.data = response.data;
-    throw error;
+
+    throw exception;
   }
 
   /**

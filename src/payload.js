@@ -261,7 +261,7 @@ class Payload {
   _push(entity, related = false) {
     if (!(entity instanceof Model)) {
       this.errors([{
-        status: 500,
+        status: '500',
         code: 500,
         message: "The JSON-API serializer only supports Chaos entities."
       }]);
@@ -653,10 +653,10 @@ class Payload {
       var validationErrors = this._validationErrors.filter(function(e){ return !!e; });
       if (validationErrors.length) {
         errors.push({
-          status: 422,
-          code: 0,
+          status: '422',
+          code: 422,
           title: 'Validation Error',
-          meta: this._validationErrors.slice()
+          data: this._validationErrors.slice()
         });
       }
       return errors;
