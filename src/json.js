@@ -149,34 +149,6 @@ class Json extends Source {
    */
   _handlers() {
     return merge({}, super._handlers(), {
-      cast: {
-        'string': function(value, options) {
-          return String(value);
-        },
-        'integer': function(value, options) {
-          return Number.parseInt(value);
-        },
-        'float': function(value, options) {
-          return Number.parseFloat(value);
-        },
-        'decimal': function(value, options) {
-          var defaults = { precision: 2 };
-          options = extend({}, defaults, options);
-          return Number(value).toFixed(options.precision);
-        },
-        'date':function(value, options) {
-          return new Date(value);
-        },
-        'datetime': function(value, options) {
-          return new Date(value);
-        },
-        'boolean': function(value, options) {
-          return !!value;
-        },
-        'null': function(value, options) {
-          return null;
-        }
-      },
       json: {
         'object': function(value, options) {
           return value.to('json', options);
