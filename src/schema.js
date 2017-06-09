@@ -154,8 +154,8 @@ class Schema extends BaseSchema {
       try {
         var json = yield this.connection().post('/' + this.source(), payload.serialize());
         this._amendCollection(inserts, Payload.parse(extend({ data:[] }, json)).export(), { exists: true });
-      } catch (response) {
-        this._manageErrors(inserts, response);
+      } catch (exception) {
+        this._manageErrors(inserts, exception);
       }
     }.bind(this));
   }
@@ -177,8 +177,8 @@ class Schema extends BaseSchema {
       try {
         var json = yield this.connection().patch('/' + this.source(), payload.serialize());
         this._amendCollection(updates, Payload.parse(extend({ data:[] }, json)).export(), { exists: true });
-      } catch (response) {
-        this._manageErrors(updates, response);
+      } catch (exception) {
+        this._manageErrors(updates, exception);
       }
     }.bind(this));
   }
@@ -205,11 +205,12 @@ class Schema extends BaseSchema {
    * Manage errors as well as validation errors.
    *
    * @param Array  collection The sent collection
-   * @param Object response   The JSON-API error response payload
+   * @param Object exception  The response exception
    */
-  _manageErrors(collection, response) {
+  _manageErrors(collection, exception) {
     var exception = new Error();
-    exception.data = response.data;
+    var response = exception.response;
+    exception.response = response;
 
     if (response.data && response.data.errors) {
       var errors = response.data.errors;
@@ -252,7 +253,8 @@ class Schema extends BaseSchema {
       payload.delete(instance);
       try {
         yield this.connection().delete('/' + this.source(), payload.serialize());
-      } catch (response) {
+      } catch (exception) {
+        var response = exception.response;
         if (response.data && response.data.errors) {
           var errors = response.data.errors;
           for (var error of errors) {

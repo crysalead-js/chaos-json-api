@@ -235,7 +235,7 @@ class Json extends Source {
             resolve(data);
           } else {
             var exception = new Error();
-            exception.data = this._lastResponse;
+            exception.response = this._lastResponse;
             if (data.error) {
               exception.message = data.error.title;
             }
