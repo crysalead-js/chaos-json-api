@@ -205,11 +205,11 @@ class Schema extends BaseSchema {
    * Manage errors as well as validation errors.
    *
    * @param Array  collection The sent collection
-   * @param Object exception  The response exception
+   * @param Object e          The response exception
    */
-  _manageErrors(collection, exception) {
+  _manageErrors(collection, e) {
     var exception = new Error();
-    var response = exception.response;
+    var response = e.response;
     exception.response = response;
 
     if (response.data && response.data.errors) {
@@ -217,6 +217,7 @@ class Schema extends BaseSchema {
       for (var error of errors) {
         if (error.code !== 422) {
           exception.message = error.title;
+          exception.data = error.data || {};
           break;
         }
         exception.message = 'Error, please check invalid input.';
