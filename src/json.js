@@ -234,7 +234,12 @@ class Json extends Source {
             }
             resolve(data);
           } else {
-            reject(this._lastResponse);
+            var exception = new Error();
+            exception.data = this._lastResponse;
+            if (data.error) {
+              exception.message = data.error.title;
+            }
+            reject(exception);
           }
         }
       };
