@@ -196,11 +196,12 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
+   * @param  Object headers Some custom headers
    * @return Promise
    */
-  send(method, path, data) {
+  send(method, path, data, headers) {
     return new Promise(function(resolve, reject) {
-      var headers = extend({}, this._config.headers);
+      headers = extend({}, this._config.headers, headers);
 
       var body = null;
 
@@ -257,10 +258,11 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
+   * @param  Object headers Some custom headers
    * @return Promise
    */
-  get(path, data) {
-    return this.send('GET', path, data);
+  get(path, data, headers) {
+    return this.send('GET', path, data, headers);
   }
 
   /**
@@ -269,10 +271,11 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
+   * @param  Object headers Some custom headers
    * @return Promise
    */
-  post(path, data) {
-    return this.send('POST', path, data);
+  post(path, data, headers) {
+    return this.send('POST', path, data, headers);
   }
 
   /**
@@ -281,10 +284,11 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
+   * @param  Object headers Some custom headers
    * @return Promise
    */
-  patch(path, data) {
-    return this.send('PATCH', path, data);
+  patch(path, data, headers) {
+    return this.send('PATCH', path, data, headers);
   }
 
   /**
@@ -293,10 +297,11 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
+   * @param  Object headers Some custom headers
    * @return Promise
    */
-  delete(path, data) {
-    return this.send('DELETE', path, data);
+  delete(path, data, headers) {
+    return this.send('DELETE', path, data, headers);
   }
 
   /**
