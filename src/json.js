@@ -207,6 +207,8 @@ class Json extends Source {
       if (/GET/i.test(method)) {
         var qs = queryStringify(data);
         path += qs ? '?' + qs : '';
+      } else if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+        body = queryStringify(data);
       } else {
         body = JSON.stringify(data);
       }
