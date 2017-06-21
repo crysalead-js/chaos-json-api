@@ -11,7 +11,7 @@ function queryStringify(obj, prefix) {
   for(var p in obj) {
     if (obj.hasOwnProperty(p)) {
       var k = prefix ? prefix + "[" + p + "]" : p, v = obj[p];
-      str.push(typeof v == "object" ?
+      str.push(typeof v === 'object' && v ?
         queryStringify(v, k) :
         encodeURIComponent(k) + "=" + encodeURIComponent(v));
     }
