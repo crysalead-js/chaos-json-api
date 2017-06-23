@@ -131,7 +131,7 @@ class Query {
   path() {
     var key = this.schema().key();
     var suffix = '';
-    for(var conditions of this._conditions) {
+    for (var conditions of this._conditions) {
       if (conditions[key] != undefined) {
         suffix = '/' + conditions[key];
       }
@@ -144,8 +144,8 @@ class Query {
 
     var key = this.schema().key();
 
-    for(var conditions of this._conditions) {
-      for(var field in conditions) {
+    for (var conditions of this._conditions) {
+      for (var field in conditions) {
         if (field === key) {
           continue;
         }

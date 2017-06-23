@@ -143,6 +143,22 @@ class Json extends Source {
   }
 
   /**
+   * Set Bearer token
+   */
+  bearer(token, unauthorizedHandler) {
+    this._unauthorizedHandler = unauthorizedHandler;
+    this._config.headers.Authorization = 'Bearer ' + token;
+  }
+
+  /**
+   * Clear auth
+   */
+  clearAuth() {
+    this._unauthorizedHandler = undefined;
+    delete this._config.headers.Authorization;
+  }
+
+  /**
    * Returns default casting handlers.
    *
    * @return Object
@@ -196,14 +212,19 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
-   * @param  Object headers Some custom headers
+   * @param  Object options Some custom options
    * @return Promise
    */
-  send(method, path, data, headers) {
-    return new Promise(function(resolve, reject) {
-      headers = extend({}, this._config.headers, headers);
+  send(method, path, data, options) {
+    return co(function*() {
+      options = options || {};
 
-      var body = null;
+      if (!options.ignoreAuth && this._pushback) {
+        yield this._pushback;
+      }
+
+      var body = '';
+      var headers = extend({}, this._config.headers, options.headers);
 
       if (/GET/i.test(method)) {
         var qs = queryStringify(data);
@@ -216,8 +237,49 @@ class Json extends Source {
 
       var url =trim.right(this._config.basePath, '/') + '/' + trim.left(path, '/');
 
-      this._lastRequest = { url: url, headers: headers, data: data, body: body };
+      var response;
 
+      try {
+        response = yield this._send(method, url, body, headers);
+      } catch (exception) {
+        if (options.ignoreAuth || !this._unauthorizedHandler || exception.response.status !== 401) {
+          throw exception;
+        }
+
+        var promiseResolve, promiseReject;
+        this._pushback = new Promise(function(resolve, reject){
+          promiseResolve = resolve;
+          promiseReject = reject;
+        });
+
+        if (yield this._unauthorizedHandler()) {
+          promiseResolve();
+          this._pushback = undefined;
+          headers = extend({}, this._config.headers, options.headers);
+          response = yield this._send(method, url, body, headers);
+        } else {
+          promiseResolve();
+          this._pushback = undefined;
+          throw exception;
+        }
+      }
+
+      this._lastRequest = { url: url, headers: headers, data: data, body: body };
+      return response;
+    }.bind(this));
+  }
+
+  /**
+   * Send request.
+   *
+   * @param  String method  The HTTP action.
+   * @param  String path    The path.
+   * @param  String body    The body.
+   * @param  Object headers HTTPheaders
+   * @return Promise
+   */
+  _send(method, url, body, headers) {
+    return new Promise(function(resolve, reject) {
       var xhr = new XMLHttpRequest();
       xhr.open(method, url, true);
       for (var name in headers) {
@@ -248,7 +310,6 @@ class Json extends Source {
       };
       xhr.withCredentials = true;
       xhr.send(body);
-
     }.bind(this));
   }
 
@@ -258,11 +319,11 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
-   * @param  Object headers Some custom headers
+   * @param  Object options Some custom options
    * @return Promise
    */
-  get(path, data, headers) {
-    return this.send('GET', path, data, headers);
+  get(path, data, options) {
+    return this.send('GET', path, data, options);
   }
 
   /**
@@ -271,11 +332,11 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
-   * @param  Object headers Some custom headers
+   * @param  Object options Some custom options
    * @return Promise
    */
-  post(path, data, headers) {
-    return this.send('POST', path, data, headers);
+  post(path, data, options) {
+    return this.send('POST', path, data, options);
   }
 
   /**
@@ -284,11 +345,11 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
-   * @param  Object headers Some custom headers
+   * @param  Object options Some custom options
    * @return Promise
    */
-  patch(path, data, headers) {
-    return this.send('PATCH', path, data, headers);
+  patch(path, data, options) {
+    return this.send('PATCH', path, data, options);
   }
 
   /**
@@ -297,11 +358,11 @@ class Json extends Source {
    * @param  String path    The path.
    * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
    *                        for POST/PUT this is the body
-   * @param  Object headers Some custom headers
+   * @param  Object options Some custom options
    * @return Promise
    */
-  delete(path, data, headers) {
-    return this.send('DELETE', path, data, headers);
+  delete(path, data, options) {
+    return this.send('DELETE', path, data, options);
   }
 
   /**
