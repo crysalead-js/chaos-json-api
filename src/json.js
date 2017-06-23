@@ -1,4 +1,5 @@
 var co = require('co');
+var Emitter = require('component-emitter');
 var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
 var Source = require('chaos-orm').Source;
@@ -401,5 +402,7 @@ class Json extends Source {
 Json._classes = {
   schema: Schema
 };
+
+Emitter(Json.prototype);
 
 module.exports = Json;
