@@ -303,7 +303,8 @@ class Json extends Source {
             var exception = new Error();
             exception.response = this._lastResponse;
             if (data.error) {
-              exception.message = data.error && data.error.title ? data.error.title : data.message || data.error;
+              exception.message = data.error.title ? data.error.title : data.message || data.error;
+              exception.data = data.error.data || {};
             }
             reject(exception);
           }
