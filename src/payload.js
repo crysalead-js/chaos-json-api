@@ -458,7 +458,7 @@ class Payload {
 
     var relations = definition.relations();
     if (relations.length) {
-      this._populateRelationships(entity, relations, result, this._embed);
+      this._populateRelationships(entity, relations, result);
     }
     return result;
   }
