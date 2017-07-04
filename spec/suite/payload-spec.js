@@ -79,7 +79,7 @@ describe("Payload", function() {
         var gallery = this.gallery.create();
         yield gallery.validates();
 
-        this.payload.set(gallery);
+        this.payload.set(gallery, { embed: true });
 
         expect(this.payload.errors()).toEqual([{
           status: '422',
@@ -179,7 +179,7 @@ describe("Payload", function() {
       image.get('tags').push(this.tag.create({ id:2, name: 'Science' }, { exists: true }));
       image.set('gallery', { name: 'Gallery 1' });
 
-      this.payload.set(image);
+      this.payload.set(image, { embed: true });
 
       var item = this.payload.export(undefined, this.image)[0];
 
@@ -247,7 +247,7 @@ describe("Payload", function() {
       image.get('tags').push({ name: 'Science' });
       image.set('gallery', { name: 'Gallery 1' });
 
-      this.payload.set(image);
+      this.payload.set(image, { embed: true });
       expect(this.payload.data()).toEqual({
         type: 'Image',
         exists: false,
@@ -322,7 +322,7 @@ describe("Payload", function() {
       image.get('tags').push(this.tag.create({ id:2, name: 'Science' }, { exists: true }));
       image.set('gallery', { name: 'Gallery 1' });
 
-      this.payload.set(image);
+      this.payload.set(image, { embed: true });
 
       expect(this.payload.data()).toEqual({
         type: 'Image',
@@ -411,7 +411,7 @@ describe("Payload", function() {
 
         var image = yield this.image.load(1, { embed: ['gallery', 'tags'] });
 
-        this.payload.set(image);
+        this.payload.set(image, { embed: true });
 
         expect(this.payload.isCollection()).toBe(false);
 
@@ -509,6 +509,37 @@ describe("Payload", function() {
 
     });
 
+    it("doesn't embed any data by default", function(done) {
+
+      co(function*() {
+        yield this.fixtures.populate('gallery');
+        yield this.fixtures.populate('image');
+        yield this.fixtures.populate('image_tag');
+        yield this.fixtures.populate('tag');
+
+        var image = yield this.image.load(1, { embed: ['gallery', 'tags'] });
+
+        this.payload.set(image);
+
+        expect(this.payload.isCollection()).toBe(false);
+
+        expect(this.payload.data()).toEqual({
+          type: 'Image',
+          id: 1,
+          exists: true,
+          attributes: {
+            gallery_id: 1,
+            name: 'amiga_1200.jpg',
+            title: 'Amiga 1200'
+          }
+        });
+
+        expect(this.payload.included()).toEqual([]);
+        done();
+      }.bind(this));
+
+    });
+
     it("serializes collections", function(done) {
 
       co(function*() {
@@ -517,7 +548,7 @@ describe("Payload", function() {
         var images = yield this.image.find().where({ id: [1 , 2] }).all();
         images.meta({ count: 10 });
 
-        this.payload.set(images);
+        this.payload.set(images, { embed: true });
 
         expect(this.payload.isCollection()).toBe(true);
 
@@ -574,7 +605,7 @@ describe("Payload", function() {
         title: ''
       }, { exists: true });
 
-      this.payload.set(image);
+      this.payload.set(image, { embed: true });
 
       expect(this.payload.data()).toEqual({
         type: 'Image',

@@ -144,13 +144,13 @@ class Schema extends BaseSchema {
    * @param  Function filter  The filter handler for which extract entities values for the insertion.
    * @return Promise          Returns `true` if insert operations succeeded, `false` otherwise.
    */
-  bulkInsert(inserts, filter) {
+  bulkInsert(inserts, filter, options) {
     return co(function*() {
       if (!inserts || !inserts.length) {
         return true;
       }
       var payload = new Payload();
-      payload.set(new Collection({ data: inserts }));
+      payload.set(new Collection({ data: inserts }), options);
       try {
         var json = yield this.connection().post('/' + this.source(), payload.serialize());
         this._amendCollection(inserts, Payload.parse(extend({ data:[] }, json)).export(), { exists: true });
@@ -167,13 +167,13 @@ class Schema extends BaseSchema {
    * @param  Function filter  The filter handler for which extract entities values to update.
    * @return Promise          Returns `true` if update operations succeeded, `false` otherwise.
    */
-  bulkUpdate(updates, filter) {
+  bulkUpdate(updates, filter, options) {
     return co(function*() {
       if (!updates || !updates.length) {
         return true;
       }
       var payload = new Payload();
-      payload.set(new Collection({ data: updates }));
+      payload.set(new Collection({ data: updates }), options);
       try {
         var json = yield this.connection().patch('/' + this.source(), payload.serialize());
         this._amendCollection(updates, Payload.parse(extend({ data:[] }, json)).export(), { exists: true });

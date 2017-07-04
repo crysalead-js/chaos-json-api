@@ -203,16 +203,16 @@ class Payload {
    * @param  mixed resource The Chaos entity/collection to set as payload.
    * @return self
    */
-  set(resource) {
+  set(resource, options) {
     this._validationErrors = [];
     if (resource instanceof Collection) {
       this.meta(resource.meta());
       for (var entity of resource) {
-        this.push(entity);
+        this.push(entity, options);
       }
       return this;
     }
-    this.push(resource);
+    this.push(resource, options);
     return this;
   }
 
@@ -222,13 +222,18 @@ class Payload {
    * @param  Object  entity The Chaos entity to push in the payload.
    * @return self
    */
-  push(entity) {
+  push(entity, options) {
+    options = options || {};
+    this._embed = options.embed || false;
+    if (this._embed === true) {
+      this._embed = entity.hierarchy();
+    }
     var data = this._push(entity);
     if (data === undefined) {
       return this;
     }
     this._dataCache.push(data);
-    this._storeValidationError(entity);
+    this._storeValidationError(entity, options);
 
     if (entity.exists()) {
       this._indexed[entity.id()] =this._dataCache.length - 1;
@@ -289,8 +294,8 @@ class Payload {
    *
    * @param object entity The Chaos entity.
    */
-  _storeValidationError(entity) {
-    var errors = entity.errors();
+  _storeValidationError(entity, options) {
+    var errors = entity.errors(options);
     if (!Object.keys(errors).length) {
       this._validationErrors.push(null);
       return;
@@ -308,8 +313,17 @@ class Payload {
   _populateRelationships(entity, relations, data) {
     var through = [];
 
+    var schema = entity.schema();
+    this._embed = schema.treeify(this._embed);
+
     for (var name of relations) {
+      if (this._embed[name] === undefined) {
+          continue;
+      }
+      var embed = this._embed;
+      this._embed = this._embed[name] && this._embed[name].embed ? this._embed[name].embed : false;
       this._populateRelationship(entity, name, data, through);
+      this._embed = embed;
     }
     if (data.relationships) {
       for (let key in data.relationships) {
@@ -444,7 +458,7 @@ class Payload {
 
     var relations = definition.relations();
     if (relations.length) {
-      this._populateRelationships(entity, relations, result);
+      this._populateRelationships(entity, relations, result, this._embed);
     }
     return result;
   }
