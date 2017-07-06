@@ -208,6 +208,9 @@ class Schema extends BaseSchema {
    * @param Object e          The response exception
    */
   _manageErrors(collection, e) {
+    if (e.stack) {
+      throw e;
+    }
     var exception = new Error();
     var response = e.response;
     exception.response = response;
