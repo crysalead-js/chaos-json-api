@@ -1,6 +1,7 @@
 var pascalize = require('pascal-case');
 var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
+var flatten = require('expand-flatten').flatten;
 var Model = require('chaos-orm').Model;
 var Collection = require('chaos-orm').Collection;
 var Through = require('chaos-orm').Through;
@@ -654,6 +655,51 @@ class Payload {
       key++;
     }
     return this;
+  }
+
+  /**
+   * Get embedded relationships.
+   *
+   * @return Array
+   */
+  embedded() {
+    var embedded = {};
+
+    for (var value of this._dataCache) {
+      if (!value || value.relationships === undefined) {
+        continue;
+      }
+      embedded = extend({}, this._embedded(value.relationships), embedded);
+    }
+    return Object.keys(flatten(embedded));
+  }
+
+  /**
+   * Helper method.
+   *
+   * @param  Array  data   The data to parse
+   * @param  String prefix The prefix
+   * @return Array
+   */
+  _embedded(data) {
+    var embedded = {};
+    for (var key in data) {
+      var value = data[key];
+      embedded[key] = true;
+      value = value.data;
+      value = Array.isArray(value) ? value[0] : value;
+      if (!value || value.type === undefined) {
+        continue;
+      }
+      var type = value.type;
+
+      if (value.id !== undefined && this._relationships[type] && this._relationships[type][value.id] !== undefined) {
+        embedded[key] = this._embedded(this._relationships[type][value.id]);
+      } else if (value.relationships) {
+        embedded[key] = this._embedded(value.relationships);
+      }
+    }
+    return embedded;
   }
 
   /**

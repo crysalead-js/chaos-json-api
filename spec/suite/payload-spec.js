@@ -310,6 +310,8 @@ describe("Payload", function() {
 
       expect(this.payload.included()).toEqual([]);
 
+      expect(this.payload.embedded()).toEqual(['gallery', 'images_tags.tag']);
+
     });
 
     it("serializes unexisting & existing entities", function() {
@@ -398,6 +400,8 @@ describe("Payload", function() {
           }
         }
       ]);
+
+      expect(this.payload.embedded()).toEqual(['gallery', 'images_tags.tag']);
 
     });
 
@@ -504,6 +508,9 @@ describe("Payload", function() {
             }
           }
         ]);
+
+        expect(this.payload.embedded()).toEqual(['gallery', 'images_tags.tag']);
+
         done();
       }.bind(this));
 
@@ -644,52 +651,56 @@ describe("Payload", function() {
         last: 'http://example.com/articles?page[offset]=10'
       });
 
-      expect(payload.included()).toEqual([{
-        type: 'people',
-        id: '9',
-        attributes: {
-          firstName: 'Dan',
-          lastName: 'Gebhardt',
-          twitter: 'dgeb'
-        },
-        links: {
-          self: 'http:\/\/example.com\/people\/9'
-        }
-      }, {
-        type: 'comments',
-        id: '5',
-        attributes: {
-          body: 'First!'
-        },
-        relationships: {
-          author: {
-            data: {
-              type: 'people',
-              id: '2'
-            }
+      expect(payload.included()).toEqual([
+        {
+          type: 'people',
+          id: '9',
+          attributes: {
+            firstName: 'Dan',
+            lastName: 'Gebhardt',
+            twitter: 'dgeb'
+          },
+          links: {
+            self: 'http:\/\/example.com\/people\/9'
           }
-        },
-        links: {
-          self: 'http:\/\/example.com\/comments\/5'
-        }
-      }, {
-        type: 'comments',
-        id: '12',
-        attributes: {
-          body: 'I like XML better'
-        },
-        relationships: {
-          author: {
-            data: {
-              type: 'people',
-              id: '9'
+        }, {
+          type: 'comments',
+          id: '5',
+          attributes: {
+            body: 'First!'
+          },
+          relationships: {
+            author: {
+              data: {
+                type: 'people',
+                id: '2'
+              }
             }
+          },
+          links: {
+            self: 'http:\/\/example.com\/comments\/5'
           }
-        },
-        links: {
-          self: 'http:\/\/example.com\/comments\/12'
+        }, {
+          type: 'comments',
+          id: '12',
+          attributes: {
+            body: 'I like XML better'
+          },
+          relationships: {
+            author: {
+              data: {
+                type: 'people',
+                id: '9'
+              }
+            }
+          },
+          links: {
+            self: 'http:\/\/example.com\/comments\/12'
+          }
         }
-      }]);
+      ]);
+
+      expect(payload.embedded()).toEqual(['author', 'comments.author']);
 
     });
 
