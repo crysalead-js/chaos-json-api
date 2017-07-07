@@ -33,8 +33,9 @@ class Query {
     var defaults = {
       model: undefined,
       schema: undefined,
-      path:       '/',
-      query:      {}
+      path: '/',
+      query: {},
+      action: undefined
     };
     config = extend({}, defaults, config);
 
@@ -94,6 +95,13 @@ class Query {
      */
     this._page = [];
 
+    /**
+     * Pagination.
+     *
+     * @var Array
+     */
+    this._action = config.action;
+
     for (var key in config.query) {
       if (typeof this[key] !== 'function') {
         throw new Error("Invalid option `'" + key + "'` as query options.");
@@ -136,7 +144,7 @@ class Query {
         suffix = '/' + conditions[key];
       }
     }
-    return this._path + suffix;
+    return this._path + suffix + (this._action ? '/:' + this._action : '');
   }
 
   queryString() {
