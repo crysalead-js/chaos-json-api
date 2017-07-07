@@ -192,9 +192,6 @@ class Schema extends BaseSchema {
    */
   _amendCollection(collection, data, options) {
     options = options || {};
-    if (collection.length !== data.length) {
-      throw new Error('Error, received data must have the same length as sent data.');
-    }
     for (var i = 0, len = data.length; i < len; i++) {
       var entity = collection[i];
       entity.amend(data[i], options);
@@ -208,7 +205,7 @@ class Schema extends BaseSchema {
    * @param Object e          The response exception
    */
   _manageErrors(collection, e) {
-    if (e.stack) {
+    if (!e.response) {
       throw e;
     }
     var exception = new Error();
