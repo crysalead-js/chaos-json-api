@@ -136,25 +136,27 @@ class Query {
    *
    * @return The path of the resource.
    */
-  path() {
-    var key = this.schema().key();
+  path(all) {
     var suffix = '';
-    for (var conditions of this._conditions) {
-      if (conditions[key] != undefined) {
-        suffix = '/' + conditions[key];
+    if (!all) {
+      var key = this.schema().key();
+      for (var conditions of this._conditions) {
+        if (conditions[key] != undefined) {
+          suffix = '/' + conditions[key];
+        }
       }
     }
     return this._path + suffix + (this._action ? '/:' + this._action : '');
   }
 
-  queryString() {
+  queryString(all) {
     var data = {filter: {}};
 
     var key = this.schema().key();
 
     for (var conditions of this._conditions) {
       for (var field in conditions) {
-        if (field === key) {
+        if (!all && field === key) {
           continue;
         }
         data.filter[field] = conditions[field];
@@ -207,7 +209,8 @@ class Query {
   get(options) {
     return co(function*(){
       var defaults = {
-        return:    'entity'
+        return: 'entity',
+        all: true
       };
       options = extend({}, defaults, options);
 
@@ -215,7 +218,7 @@ class Query {
       var ret = options['return'];
 
       var schema = this.schema();
-      var json = yield schema.connection().get(this.path(), this.queryString());
+      var json = yield schema.connection().get(this.path(options.all), this.queryString(options.all));
       var payload = Payload.parse(json);
       var data = payload.export();
 
@@ -268,6 +271,10 @@ class Query {
    */
   first(options) {
     return co(function*() {
+      var defaults = {
+        all: false
+      };
+      options = extend({}, defaults, options);
       var result = yield this.get(options);
       return Array.isArray(result) ? result[0] : result.get(0);
     }.bind(this));
