@@ -3,7 +3,8 @@ var Emitter = require('component-emitter');
 var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
 var Source = require('chaos-orm').Source;
-var dateformat = require('dateformat');
+var dateFormat = require('dateformat');
+var dateParse = require('dateparse');
 var trim = require('trim-character');
 var Schema = require('./schema');
 
@@ -187,10 +188,14 @@ class Json extends Source {
         'datetime': function(value, options) {
           options = options || {};
           options.format = options.format ? options.format : 'yyyy-mm-dd HH:MM:ss';
-          if (!(value instanceof Date)) {
-            value = new Date(value);
+          if (Number(Number.parseInt(value)) === value) {
+            value = Number.parseInt(value) * 1000;
           }
-          return dateformat(value, options.format);
+          var date = dateParse(value, true);
+          if (Number.isNaN(date.getTime())) {
+            throw new Error("Invalid date `" + value + "`, can't be parsed.");
+          }
+          return dateFormat(date, options.format, true);
         },
         'boolean': function(value, options) {
           return !!value;
