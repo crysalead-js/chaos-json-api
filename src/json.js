@@ -294,7 +294,13 @@ class Json extends Source {
       xhr.onreadystatechange = function () {
         if (xhr.readyState === 4) {
 
-          var data = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+          var data;
+
+          try {
+            data = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+          } catch (e) {
+            data = { error: xhr.responseText };
+          }
           this._lastResponse = { status: xhr.status, statusText: xhr.statusText, data: data, body: xhr.responseText };
 
           if (xhr.status >= 200 && xhr.status < 300) {
