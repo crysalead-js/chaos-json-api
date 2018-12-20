@@ -179,6 +179,9 @@ class Payload {
     if (!this._storeCache[type]) {
       this._storeCache[type] = {};
     }
+    if (!this._storeCache[type][id]) {
+      this._included.push(data);
+    }
     this._storeCache[type][id] = extend({}, data.attributes, { [key]: id });
     if (data.relationships) {
       if (!this._relationships[type]) {
@@ -186,7 +189,6 @@ class Payload {
       }
       this._relationships[type][id] = data.relationships;
     }
-    this._included.push(data);
   }
 
   /**

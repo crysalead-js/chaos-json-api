@@ -516,6 +516,215 @@ describe("Payload", function() {
 
     });
 
+    it("doesn't duplicate included data", function(done) {
+      co(function*() {
+        yield this.fixtures.populate('gallery');
+        yield this.fixtures.populate('image');
+        yield this.fixtures.populate('image_tag');
+        yield this.fixtures.populate('tag');
+
+        var image1 = yield this.image.load(1, { embed: ['gallery', 'tags'] });
+        var image4 = yield this.image.load(4, { embed: ['gallery', 'tags'] });
+
+        this.payload.set(this.image.create([image1, image4], {type: 'set'}), { embed: true });
+
+        expect(this.payload.isCollection()).toBe(true);
+
+        expect(this.payload.data()).toEqual([
+          {
+            type: 'Image',
+            id: 1,
+            exists: true,
+            attributes: {
+              gallery_id: 1,
+              name: 'amiga_1200.jpg',
+              title: 'Amiga 1200'
+            },
+            relationships: {
+              gallery: {
+                data: {
+                  type: 'Gallery',
+                  id: 1,
+                  exists: true
+                }
+              },
+              images_tags: {
+                data: [{
+                  type: 'ImageTag',
+                  id: 1,
+                  exists: true
+                }, {
+                  type: 'ImageTag',
+                  id: 2,
+                  exists: true
+                }]
+              }
+            }
+          }, {
+            type: 'Image',
+            id: 4,
+            exists: true,
+            attributes: {
+              gallery_id: 2,
+              name: 'silicon_valley.jpg',
+              title: 'Silicon Valley'
+            },
+            relationships: {
+              gallery: {
+                data: {
+                  type: 'Gallery',
+                  id: 2,
+                  exists: true
+                }
+              },
+              images_tags: {
+                data: [{
+                  type: 'ImageTag',
+                  id: 5,
+                  exists: true
+                }, {
+                  type: 'ImageTag',
+                  id: 6,
+                  exists: true
+                }, {
+                  type: 'ImageTag',
+                  id: 7,
+                  exists: true
+                }]
+              }
+            }
+          }
+        ]);
+
+        expect(this.payload.included()).toEqual([
+          {
+            type: 'Gallery',
+            id: 1,
+            exists: true,
+            attributes: {
+              name: 'Foo Gallery'
+            }
+          }, {
+            type: 'Tag',
+            id: 1,
+            exists: true,
+            attributes: {
+              name: 'High Tech'
+            }
+          }, {
+            type: 'ImageTag',
+            id: 1,
+            exists: true,
+            attributes: {
+              image_id: 1,
+              tag_id: 1
+            },
+            relationships: {
+              tag: {
+                data: {
+                  type: 'Tag',
+                  id: 1,
+                  exists: true
+                }
+              }
+            }
+          }, {
+            type: 'Tag',
+            id: 3,
+            exists: true,
+            attributes: {
+              name: 'Computer'
+            }
+          }, {
+            type: 'ImageTag',
+            id: 2,
+            exists: true,
+            attributes: {
+              image_id: 1,
+              tag_id: 3
+            },
+            relationships: {
+              tag: {
+                data: {
+                  type: 'Tag',
+                  id: 3,
+                  exists: true
+                }
+              }
+            }
+          }, {
+            type: 'Gallery',
+            id: 2,
+            exists: true,
+            attributes: {
+              name: 'Bar Gallery'
+            }
+          }, {
+            type: 'Tag',
+            id: 6,
+            exists: true,
+            attributes: {
+              name: 'City'
+            }
+          }, {
+            type: 'ImageTag',
+            id: 5,
+            exists: true,
+            attributes: {
+              image_id: 4,
+              tag_id: 6
+            },
+            relationships: {
+              tag: {
+                data: {
+                  type: 'Tag',
+                  id: 6,
+                  exists: true
+                }
+              }
+            }
+          }, {
+            type: 'ImageTag',
+            id: 6,
+            exists: true,
+            attributes: {
+              image_id: 4,
+              tag_id: 3
+            },
+            relationships: {
+              tag: {
+                data: {
+                  type: 'Tag',
+                  id: 3,
+                  exists: true
+                }
+              }
+            }
+          }, {
+            type: 'ImageTag',
+            id: 7,
+            exists: true,
+            attributes: {
+              image_id: 4,
+              tag_id: 1
+            },
+            relationships: {
+              tag: {
+                data: {
+                  type: 'Tag',
+                  id: 1,
+                  exists: true
+                }
+              }
+            }
+          }
+
+        ]);
+
+        done();
+      }.bind(this));
+    });
+
     it("doesn't embed any data by default", function(done) {
 
       co(function*() {
