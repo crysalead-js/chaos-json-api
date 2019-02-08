@@ -244,7 +244,7 @@ class Json extends Source {
       var response;
 
       try {
-        response = yield this._send(method, url, body, headers);
+        response = yield this._send(method, url, body, headers, options);
       } catch (exception) {
         if (options.ignoreAuth || !this._unauthorizedHandler || exception.response.status !== 401) {
           throw exception;
@@ -259,8 +259,8 @@ class Json extends Source {
         if (yield this._unauthorizedHandler()) {
           promiseResolve();
           this._pushback = undefined;
-          headers = extend({}, this._config.headers, options.headers);
-          response = yield this._send(method, url, body, headers);
+          headers = extend({}, this._config.headers, options.headers, options);
+          response = yield this._send(method, url, body, headers, options);
         } else {
           promiseResolve();
           this._pushback = undefined;
@@ -282,9 +282,9 @@ class Json extends Source {
    * @param  Object headers HTTPheaders
    * @return Promise
    */
-  _send(method, url, body, headers) {
+  _send(method, url, body, headers, options) {
     return new Promise(function(resolve, reject) {
-      var xhr = new XMLHttpRequest();
+      var xhr = options.xhr || new XMLHttpRequest();
       xhr.open(method, url, true);
       for (var name in headers) {
         xhr.setRequestHeader(name, headers[name]);
