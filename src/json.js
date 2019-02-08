@@ -168,37 +168,37 @@ class Json extends Source {
   _handlers() {
     return merge({}, super._handlers(), {
       json: {
-        'object': function(value, options) {
-          return value.to('json', options);
+        'object': function(value, column) {
+          return value.to('json', column);
         },
-        'string': function string(value, options) {
+        'string': function string(value, column) {
           return String(value);
         },
-        'integer': function(value, options) {
+        'integer': function(value, column) {
           return Number.parseInt(value);
         },
-        'float': function(value, options) {
+        'float': function(value, column) {
           return Number.parseFloat(value);
         },
-        'date': function(value, options) {
-          options = options || {};
-          options.format = options.format ? options.format : 'yyyy-mm-dd';
-          return this.convert('array', 'datetime', value, options);
+        'date': function(value, column) {
+          column = column || {};
+          column.format = column.format ? column.format : 'yyyy-mm-dd';
+          return this.convert('array', 'datetime', value, column);
         }.bind(this),
-        'datetime': function(value, options) {
-          options = options || {};
-          options.format = options.format ? options.format : 'yyyy-mm-dd HH:MM:ss';
+        'datetime': function(value, column) {
+          column = column || {};
+          column.format = column.format ? column.format : 'yyyy-mm-dd HH:MM:ss';
           var date = dateParse(value, true);
           if (Number.isNaN(date.getTime())) {
             throw new Error("Invalid date `" + value + "`, can't be parsed.");
           }
-          return dateFormat(date, options.format, true);
+          return dateFormat(date, column.format, true);
         },
-        'boolean': function(value, options) {
+        'boolean': function(value, column) {
           value = Number.isNaN(Number.parseInt(value, 10)) ? value : Number.parseInt(value, 10);
           return !!value;
         },
-        'null': function(value, options) {
+        'null': function(value, column) {
           return null;
         }
       }
