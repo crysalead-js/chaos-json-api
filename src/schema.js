@@ -153,7 +153,7 @@ class Schema extends BaseSchema {
       payload.set(new Collection({ data: inserts }), options);
       try {
         var json = yield this.connection().post('/' + this.source(), payload.serialize());
-        this._amendCollection(inserts, Payload.parse(extend({ data:[] }, json)).export(), { exists: true });
+        this._amendCollection(inserts, Payload.parse(extend({ data:[] }, json)).export(), { exists: 'all' });
       } catch (exception) {
         this._manageErrors(inserts, exception);
       }
@@ -176,7 +176,7 @@ class Schema extends BaseSchema {
       payload.set(new Collection({ data: updates }), options);
       try {
         var json = yield this.connection().patch('/' + this.source(), payload.serialize());
-        this._amendCollection(updates, Payload.parse(extend({ data:[] }, json)).export(), { exists: true });
+        this._amendCollection(updates, Payload.parse(extend({ data:[] }, json)).export(), { exists: 'all' });
       } catch (exception) {
         this._manageErrors(updates, exception);
       }
