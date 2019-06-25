@@ -246,7 +246,7 @@ class Json extends Source {
       try {
         response = yield this._send(method, url, body, headers, options);
       } catch (exception) {
-        if (options.ignoreAuth || !this._unauthorizedHandler || exception.response.status !== 401) {
+        if (options.ignoreAuth || !this._unauthorizedHandler || exception.httpCode !== 401) {
           throw exception;
         }
 
@@ -270,7 +270,9 @@ class Json extends Source {
 
       this._lastRequest = { url: url, headers: headers, data: data, body: body };
       return response;
-    }.bind(this));
+    }.bind(this)).catch((exception) => {
+      throw exception;
+    });
   }
 
   /**
@@ -289,34 +291,43 @@ class Json extends Source {
       for (var name in headers) {
         xhr.setRequestHeader(name, headers[name]);
       }
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4) {
+      xhr.onabort = function() {
+        var exception = new Error('The request has been aborted.');
+        exception.httpCode = 0;
+        reject(exception);
+      };
+      xhr.onerror = function() {
+        var exception = new Error('An network error has occurred (' + String(xhr.status) + ').');
+        exception.httpCode = -1;
+        reject(exception);
+      };
+      xhr.onload = function () {
+        var data;
+        try {
+          data = xhr.responseText ? JSON.parse(xhr.responseText) : {};
+        } catch (e) {
+          data = { error: xhr.responseText };
+        }
+        this._lastResponse = { status: xhr.status, statusText: xhr.statusText, data: data, body: xhr.responseText };
 
-          var data;
-
-          try {
-            data = xhr.responseText ? JSON.parse(xhr.responseText) : {};
-          } catch (e) {
-            data = { error: xhr.responseText };
-          }
-          this._lastResponse = { status: xhr.status, statusText: xhr.statusText, data: data, body: xhr.responseText };
-
-          if (xhr.status >= 200 && xhr.status < 300) {
-            if (/POST/i.test(method)) {
-              if (data.data && !Array.isArray(data.data)) {
-                this._lastInsert = data.data;
-              }
+        if (xhr.status >= 200 && xhr.status < 300) {
+          if (/POST/i.test(method)) {
+            if (data.data && !Array.isArray(data.data)) {
+              this._lastInsert = data.data;
             }
-            resolve(data);
+          }
+          resolve(data);
+        } else {
+          var exception = new Error();
+          exception.httpCode = xhr.status;
+          exception.response = this._lastResponse;
+          if (data.error) {
+            exception.message = data.error.title ? data.error.title : data.message || data.error;
+            exception.data = data.error.data || {};
           } else {
-            var exception = new Error();
-            exception.response = this._lastResponse;
-            if (data.error) {
-              exception.message = data.error.title ? data.error.title : data.message || data.error;
-              exception.data = data.error.data || {};
-            }
-            reject(exception);
+            exception.message = 'A server error has occurred (' + String(xhr.status) + ').';
           }
+          reject(exception);
         }
       };
       xhr.withCredentials = true;

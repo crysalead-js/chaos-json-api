@@ -231,10 +231,7 @@ class Schema extends BaseSchema {
           collection[i].invalidate(data[i]);
         }
       }
-    } else {
-      exception.message = 'An unknown error has occurred.';
     }
-
     throw exception;
   }
 
