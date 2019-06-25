@@ -209,6 +209,7 @@ class Schema extends BaseSchema {
       throw e;
     }
     var exception = new Error();
+    exception.httpCode = e.httpCode;
     var response = e.response;
     exception.response = response;
 
