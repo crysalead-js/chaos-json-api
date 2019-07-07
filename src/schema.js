@@ -255,6 +255,7 @@ class Schema extends BaseSchema {
       } catch (e) {
         var exception = new Error();
         var response = e.response;
+        exception.httpCode = e.httpCode;
         if (response.data && response.data.errors) {
           var errors = response.data.errors;
           for (var error of errors) {
