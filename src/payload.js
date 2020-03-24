@@ -1,4 +1,4 @@
-var pascalize = require('pascal-case');
+var pascalize = require('pascal-case').pascalCase;
 var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
 var flatten = require('expand-flatten').flatten;
