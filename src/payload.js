@@ -513,14 +513,12 @@ class Payload {
     for (var data of collection) {
       var type = data.type;
       var key = this._keys[type] ? this._keys[type] : this._key;
-      var result, indexes;
+      var result;
 
       if (data.id) {
         result = { [key]: data.id };
-        indexes = { [data.type]: {  [data.id]: true } };
       } else {
         result = {};
-        indexes = {};
       }
 
       options.exists = !!data.exists;
@@ -535,9 +533,9 @@ class Payload {
         for (var key in data.relationships) {
           var to = schema ? schema.relation(key).to() : undefined;
           if (model) {
-            result.set(key, this._relationship(data.relationships[key].data, indexes, to));
+            result.set(key, this._relationship(data.relationships[key].data, to));
           } else {
-            result[key] = this._relationship(data.relationships[key].data, indexes, to);
+            result[key] = this._relationship(data.relationships[key].data, to);
           }
         }
       }
@@ -549,7 +547,7 @@ class Payload {
   /**
    * Helper for `JsonApi::export()`.
    */
-  _relationship(collection, indexes, model) {
+  _relationship(collection, model) {
     var isCollection = Array.isArray(collection);
     var collection = isCollection ? collection : [collection];
     var values = [];
@@ -562,13 +560,6 @@ class Payload {
     for (var data of collection) {
       options.exists = !!data.exists;
       if (data.id != null) {
-        if (indexes[data.type] && indexes[data.type][data.id]) {
-          continue;
-        }
-        if (!indexes[data.type]) {
-          indexes[data.type] = {};
-        }
-        indexes[data.type][data.id] = true;
         if (!this._storeCache[data.type] || !this._storeCache[data.type][data.id]) {
           continue;
         }
@@ -586,12 +577,11 @@ class Payload {
       for (var key in relationships) {
         var value = relationships[key];
         var to = schema ? schema.relation(key).to() : undefined;
-        var item = this._relationship(value.data, indexes, to);
+        var item = this._relationship(value.data, to);
         if (item) {
           result[key] = item;
         }
       }
-
       values.push(exporter(model, result, options));
     }
     return isCollection ? values : values[0];

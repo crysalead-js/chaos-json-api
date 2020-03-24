@@ -147,6 +147,12 @@ describe("Payload", function() {
             id: '5',
             body: 'First!'
           }, {
+            "author": {
+              "firstName": "Dan",
+              "id": "9",
+              "lastName": "Gebhardt",
+              "twitter": "dgeb"
+            },
             id: '12',
             body: 'I like XML better'
           }]
