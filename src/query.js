@@ -149,7 +149,7 @@ class Query {
     return this._path + suffix + (this._action ? '/:' + this._action : '');
   }
 
-  queryString(all) {
+  queryString(all, options = {}) {
     var data = {filter: {}};
 
     var key = this.schema().key();
@@ -196,6 +196,9 @@ class Query {
     if (sort.length) {
       data.sort = sort.join(',');
     }
+    if (options.return === 'array') {
+      data.raw = true;
+    }
 
     return data;
   }
@@ -218,7 +221,7 @@ class Query {
       var ret = options['return'];
 
       var schema = this.schema();
-      var json = yield schema.connection().get(this.path(options.all), this.queryString(options.all));
+      var json = yield schema.connection().get(this.path(options.all), this.queryString(options.all, options));
       var payload = Payload.parse(json);
       var data = payload.export();
 
@@ -238,12 +241,10 @@ class Query {
           break;
         case 'array':
         case 'object':
+          var key = schema.key();
           collection = [];
           for (var record of data) {
-            var entity = extend({}, record.attributes);
-            if (record['id']) {
-              entity[key] = record['id'];
-            }
+            var entity = extend({}, record);
             collection.push(entity);
           }
           break;
