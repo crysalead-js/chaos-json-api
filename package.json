@@ -1,6 +1,6 @@
 {
   "name": "chaos-json-api",
-  "version": "5.0.1",
+  "version": "5.0.2",
   "description": "JSON API adapter for Chaos ORM.",
   "license": "MIT",
   "repository": {
