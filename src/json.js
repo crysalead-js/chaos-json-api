@@ -324,6 +324,14 @@ class Json extends Source {
           if (data.error) {
             exception.message = data.error.title ? data.error.title : data.message || data.error;
             exception.data = data.error.data || {};
+          } else if (data.errors) {
+            if (data.errors.length === 1) {
+              exception.message = data.errors[0].title ? data.errors[0].title : data.errors[0].message || data.errors[0];
+              exception.data = data.errors[0].data || {};
+            } else {
+              exception.message = 'Multiple server errors has occurred (' + String(xhr.status) + ').';
+              exception.errors = data.errors;
+            }
           } else {
             exception.message = 'A server error has occurred (' + String(xhr.status) + ').';
           }
