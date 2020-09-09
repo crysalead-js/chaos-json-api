@@ -216,12 +216,12 @@ class Schema extends BaseSchema {
     if (response.data && response.data.errors) {
       var errors = response.data.errors;
       for (var error of errors) {
-        if (error.code !== 422) {
+        if (error.status != 422) {
           exception.message = error.title;
           exception.data = error.data || {};
           break;
         }
-        exception.message = 'Error, please check invalid input.';
+        exception.message = 'Error, please check invalid inputs.';
 
         var data = error.data;
         if (collection.length !== data.length) {
