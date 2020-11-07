@@ -232,7 +232,13 @@ class Json extends Source {
 
       if (/GET/i.test(method)) {
         var qs = queryStringify(data);
-        path += qs ? '?' + qs : '';
+        if (qs.length < 8 * 1024) {
+          path += qs ? '?' + qs : '';
+        } else {
+          method = 'FETCH';
+          body = qs;
+          headers['Content-Type'] = 'application/x-www-form-urlencoded';
+        }
       } else if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
         body = queryStringify(data);
       } else {
