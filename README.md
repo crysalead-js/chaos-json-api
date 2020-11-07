@@ -1,6 +1,6 @@
 # chaos-json-api
 
-[![Build Status](https://travis-ci.org/crysalead-js/chaos-json-api.png?branch=master)](https://travis-ci.org/crysalead-js/chaos-json-api)
+[![Build Status](https://travis-ci.com/crysalead-js/chaos-json-api.png?branch=master)](https://travis-ci.com/crysalead-js/chaos-json-api)
 [![Coverage Status](https://coveralls.io/repos/crysalead-js/chaos-json-api/badge.svg)](https://coveralls.io/r/crysalead-js/chaos-json-api)
 
 JSON API adapter for Chaos ORM.
