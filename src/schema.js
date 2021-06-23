@@ -215,22 +215,15 @@ class Schema extends BaseSchema {
 
     if (response.data && response.data.errors) {
       var errors = response.data.errors;
-      for (var error of errors) {
+      for (var i = 0, len = errors.length; i < len; i++) {
+        var error = errors[i];
         if (error.status != 422) {
           exception.message = error.title;
           exception.data = error.data || {};
           break;
         }
         exception.message = 'Error, please check invalid inputs.';
-
-        var data = error.data;
-        if (collection.length !== data.length) {
-          exception.message = 'Error, received errors must have the same length as sent data.';
-          break;
-        }
-        for (var i = 0, len = data.length; i < len; i++) {
-          collection[i].invalidate(data[i]);
-        }
+        collection[i].invalidate(error.data);
       }
     }
     throw exception;
