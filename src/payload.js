@@ -658,7 +658,7 @@ class Payload {
     var embedded = {};
 
     for (var value of this._dataCache) {
-      if (!value || value.relationships === undefined) {
+      if (!value || value.relationships === undefined) {
         continue;
       }
       embedded = extend({}, this._embedded(value.relationships), embedded);

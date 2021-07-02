@@ -146,7 +146,7 @@ class Schema extends BaseSchema {
    */
   bulkInsert(inserts, filter, options) {
     return co(function*() {
-      if (!inserts || !inserts.length) {
+      if (!inserts || !inserts.length) {
         return true;
       }
       var payload = new Payload();
@@ -156,7 +156,9 @@ class Schema extends BaseSchema {
         this._amendCollection(inserts, Payload.parse(extend({ data:[] }, json)).export(), { exists: 'all' });
       } catch (exception) {
         this._manageErrors(inserts, exception);
+        return false;
       }
+      return true;
     }.bind(this));
   }
 
@@ -179,7 +181,9 @@ class Schema extends BaseSchema {
         this._amendCollection(updates, Payload.parse(extend({ data:[] }, json)).export(), { exists: 'all' });
       } catch (exception) {
         this._manageErrors(updates, exception);
+        return false;
       }
+      return true;
     }.bind(this));
   }
 
@@ -191,7 +195,7 @@ class Schema extends BaseSchema {
    * @param Object options    Some additionnal amend options
    */
   _amendCollection(collection, data, options) {
-    options = options || {};
+    options = options || {};
     for (var i = 0, len = data.length; i < len; i++) {
       var entity = collection[i];
       entity.amend(data[i], options);

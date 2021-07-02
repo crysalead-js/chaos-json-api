@@ -221,7 +221,7 @@ class Json extends Source {
    */
   send(method, path, data, options) {
     return co(function*() {
-      options = options || {};
+      options = options || {};
 
       if (!options.ignoreAuth && this._pushback) {
         yield this._pushback;
@@ -292,7 +292,7 @@ class Json extends Source {
    */
   _send(method, url, body, headers, options) {
     return new Promise(function(resolve, reject) {
-      var xhr = options.xhr || new XMLHttpRequest();
+      var xhr = options.xhr || new XMLHttpRequest();
       xhr.open(method, url, true);
       for (var name in headers) {
         xhr.setRequestHeader(name, headers[name]);
@@ -329,7 +329,7 @@ class Json extends Source {
           exception.response = this._lastResponse;
           if (data.error) {
             exception.message = data.error.title ? data.error.title : data.message || data.error;
-            exception.data = data.error.data || {};
+            exception.data = data.error.data || {};
           } else if (data.errors) {
             if (data.errors.length === 1) {
               exception.message = data.errors[0].title ? data.errors[0].title : data.errors[0].message || data.errors[0];
