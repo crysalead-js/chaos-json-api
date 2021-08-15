@@ -219,7 +219,7 @@ class Json extends Source {
    * @param  Object options Some custom options
    * @return Promise
    */
-  send(method, path, data, options) {
+  send(method, path, queryString, data, options) {
     return co(function*() {
       options = options || {};
 
@@ -230,19 +230,13 @@ class Json extends Source {
       var body = '';
       var headers = extend({}, this._config.headers, options.headers);
 
-      if (/GET/i.test(method)) {
-        var qs = queryStringify(data);
-        if (qs.length < 8 * 1024) {
-          path += qs ? '?' + qs : '';
-        } else {
-          method = 'FETCH';
-          body = qs;
-          headers['Content-Type'] = 'application/x-www-form-urlencoded';
-        }
-      } else if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
-        body = queryStringify(data);
+      var qs = queryStringify(queryString);
+      path += qs ? '?' + qs : '';
+
+      if (headers['Content-Type'] === 'application/x-www-form-urlencoded') {
+        body = data ? queryStringify(data) : body;
       } else {
-        body = JSON.stringify(data);
+        body = data ? JSON.stringify(data) : body;
       }
 
       var url =trim.right(this._config.basePath, '/') + '/' + trim.left(path, '/');
@@ -352,53 +346,66 @@ class Json extends Source {
   /**
    * Send GET request.
    *
-   * @param  String path    The path.
-   * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
-   *                        for POST/PUT this is the body
+   * @param  String path        The path.
+   * @param  Object queryString The unencoded query string for the request.
+   * @param  Object data        The unencoded body data
    * @param  Object options Some custom options
    * @return Promise
    */
-  get(path, data, options) {
-    return this.send('GET', path, data, options);
+  get(path, queryString, data, options) {
+    return this.send('GET', path, queryString, data, options);
+  }
+
+  /**
+   * Send FETCH request.
+   *
+   * @param  String path        The path.
+   * @param  Object queryString The unencoded query string for the request.
+   * @param  Object data        The unencoded body data
+   * @param  Object options Some custom options
+   * @return Promise
+   */
+  fetch(path, queryString, data, options) {
+    return this.send('FETCH', path, queryString, data, options);
   }
 
   /**
    * Send POST request.
    *
-   * @param  String path    The path.
-   * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
-   *                        for POST/PUT this is the body
+   * @param  String path        The path.
+   * @param  Object queryString The unencoded query string for the request.
+   * @param  Object data        The unencoded body data
    * @param  Object options Some custom options
    * @return Promise
    */
-  post(path, data, options) {
-    return this.send('POST', path, data, options);
+  post(path, queryString, data, options) {
+    return this.send('POST', path, queryString, data, options);
   }
 
   /**
    * Send PATCH request.
    *
-   * @param  String path    The path.
-   * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
-   *                        for POST/PUT this is the body
+   * @param  String path        The path.
+   * @param  Object queryString The unencoded query string for the request.
+   * @param  Object data        The unencoded body data
    * @param  Object options Some custom options
    * @return Promise
    */
-  patch(path, data, options) {
-    return this.send('PATCH', path, data, options);
+  patch(path, queryString, data, options) {
+    return this.send('PATCH', path, queryString, data, options);
   }
 
   /**
    * Send DELETE request.
    *
-   * @param  String path    The path.
-   * @param  Object data    The parameters for the request. For GET/DELETE this is the query string
-   *                        for POST/PUT this is the body
+   * @param  String path        The path.
+   * @param  Object queryString The unencoded query string for the request.
+   * @param  Object data        The unencoded body data
    * @param  Object options Some custom options
    * @return Promise
    */
-  delete(path, data, options) {
-    return this.send('DELETE', path, data, options);
+  delete(path, queryString, data, options) {
+    return this.send('DELETE', path, queryString, data, options);
   }
 
   /**

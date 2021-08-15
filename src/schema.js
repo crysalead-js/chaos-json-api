@@ -152,7 +152,7 @@ class Schema extends BaseSchema {
       var payload = new Payload();
       payload.set(new Collection({ data: inserts }), options);
       try {
-        var json = yield this.connection().post('/' + this.source(), payload.serialize());
+        var json = yield this.connection().post('/' + this.source(), options.queryString || {}, payload.serialize());
         this._amendCollection(inserts, Payload.parse(extend({ data:[] }, json)).export(), { exists: 'all' });
       } catch (exception) {
         this._manageErrors(inserts, exception);
@@ -177,7 +177,7 @@ class Schema extends BaseSchema {
       var payload = new Payload();
       payload.set(new Collection({ data: updates }), options);
       try {
-        var json = yield this.connection().patch('/' + this.source(), payload.serialize());
+        var json = yield this.connection().patch('/' + this.source(), options.queryString || {}, payload.serialize());
         this._amendCollection(updates, Payload.parse(extend({ data:[] }, json)).export(), { exists: 'all' });
       } catch (exception) {
         this._manageErrors(updates, exception);
@@ -248,7 +248,7 @@ class Schema extends BaseSchema {
       }
       payload.delete(instance);
       try {
-        yield this.connection().delete('/' + this.source(), payload.serialize());
+        yield this.connection().delete('/' + this.source(), {}, payload.serialize());
       } catch (e) {
         var exception = new Error();
         var response = e.response;

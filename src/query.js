@@ -3,6 +3,16 @@ var extend = require('extend-merge').extend;
 var merge = require('extend-merge').merge;
 var Payload = require('./payload');
 
+function isEmpty(value) {
+  if (!value) {
+    return true;
+  }
+  for (var i in value) {
+    return false;
+  }
+  return true;
+}
+
 /**
  * The Query wrapper.
  */
@@ -61,7 +71,7 @@ class Query {
     this._fields = [];
 
     /**
-     * The filter conditions.
+     * The conditions.
      *
      * @var Array
      */
@@ -93,7 +103,7 @@ class Query {
      *
      * @var Array
      */
-    this._page = [];
+    this._page = {};
 
     /**
      * Pagination.
@@ -149,8 +159,9 @@ class Query {
     return this._path + suffix + (this._action ? '/:' + this._action : '');
   }
 
-  queryString(all, options = {}) {
-    var data = {filter: {}};
+  toArray(all, options = {}) {
+    var data = { };
+    var query = { conditions: [] };
 
     var key = this.schema().key();
 
@@ -159,47 +170,45 @@ class Query {
         if (!all && field === key) {
           continue;
         }
-        data.filter[field] = conditions[field];
-        if (Array.isArray(data.filter[field])) {
-          data.filter[field] = data.filter[field].join(',');
-        }
       }
+      query.conditions.push(conditions);
+    }
+
+    if (Object.keys(query.conditions).length === 0) {
+      delete query.conditions;
+    }
+
+    if (this._has.length) {
+      query.has = this._has;
     }
 
     if (this._embed.length) {
-      data.include = this._embed.join(',');
+      query.embed = this._embed;
     }
 
-    if (Object.keys(data.filter).length === 0) {
-      delete data.filter;
+    if (this._order.size) {
+      query.order = [];
     }
+
+    this._order.forEach(function (dir, key) {
+      query.order.push({ [key]: dir });
+    });
 
     if (this._page.limit) {
       if (this._page.page) {
-        data.page = {
-          offset: (this._page.page - 1) * this._page.limit
-        };
+        query.offset = (this._page.page - 1) * this._page.limit;
       } else {
-        data.page = {
-          offset: this._page.offset || 0
-        };
+        query.offset = this._page.offset || 0;
       }
-      data.page.limit = this._page.limit;
+      query.limit = this._page.limit;
     }
 
-    var sort = [];
-
-    this._order.forEach(function (dir, key) {
-      sort.push(dir === 'DESC' ? '-' + key : key);
-    });
-
-    if (sort.length) {
-      data.sort = sort.join(',');
+    if (options.return && options.return === 'array') {
+      data.options = { return: 'array' };
     }
-    if (options.return === 'array') {
-      data.raw = true;
+    if (Object.keys(query).length !== 0) {
+      data.query = query;
     }
-
     return data;
   }
 
@@ -221,7 +230,15 @@ class Query {
       var ret = options['return'];
 
       var schema = this.schema();
-      var json = yield schema.connection().get(this.path(options.all), this.queryString(options.all, options));
+
+      data =  extend({}, this.toArray(options.all, options), options.requestBody || {});
+
+      var json = yield schema.connection().fetch(this.path(options.all), options.queryString || {}, isEmpty(data) ? null : data, {
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
       var payload = Payload.parse(json);
       var data = payload.export();
 
@@ -319,7 +336,10 @@ class Query {
     if (!arguments.length) {
       return this._conditions;
     }
-    this._conditions.push(conditions);
+    conditions = Array.isArray(conditions) ? conditions : (isEmpty(conditions) ? [] : [conditions]);
+    for (var cond of conditions) {
+      this._conditions.push(cond);
+    }
     return this;
   }
 
