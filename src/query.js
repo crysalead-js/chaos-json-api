@@ -204,7 +204,7 @@ class Query {
     }
 
     if (options.return && options.return === 'array') {
-      data.options = { return: 'array' };
+      data.return = 'array';
     }
     if (Object.keys(query).length !== 0) {
       data.query = query;
