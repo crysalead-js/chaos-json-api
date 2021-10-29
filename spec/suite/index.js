@@ -7,3 +7,4 @@ Model.definition(Schema);
 
 require('./json-spec');
 require('./payload-spec');
+require('./query-spec');

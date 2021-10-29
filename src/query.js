@@ -246,7 +246,7 @@ class Query {
         case 'entity':
           var model = this.model();
           if (!model) {
-            throw new Error("Missing model for this query, set `'return'` to `'object'` to get row data.");
+            throw new Error("Missing model for this query, set `'return'` to `'array'` to get row data.");
           }
 
           collection = model.create(data, {
@@ -294,7 +294,7 @@ class Query {
       };
       options = extend({}, defaults, options);
       var result = yield this.get(options);
-      return Array.isArray(result) ? result[0] : result.get(0);
+      return Array.isArray(result) ? result[0] || null : (result.has(0) ? result.get(0) : null);
     }.bind(this));
   }
 
